@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Reports &amp; Analytics | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .report-tab-btn {
+            border: 0;
+            background: none;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s;
+        }
+
+        .report-tab-btn.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        @media print {
+            .app-sidebar, .app-topbar, .report-tabs-nav, .no-print {
+                display: none !important;
+            }
+            .app-main, .app-content {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Monitoring / Reports</div>
+                        <h1 class="page-heading-title">Executive Project Analytics &amp; Reports</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Operational Intelligence &amp; Status Dossier</h2>
+                        <div class="text-muted" style="font-size: 13px;">Holistic cross-module reporting across project budgets, workforce velocity, and inventory</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 no-print">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()" style="font-weight: 600; border-radius: 8px;">
+                            <i class="bi bi-printer me-1"></i> Print / Export PDF
+                        </button>
+                        <button type="button" class="btn-saas-primary" onclick="loadReports()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Refresh Live Metrics</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Executive Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e8f5f8; color:#0fa8c4;">
+                                <i class="bi bi-buildings-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">ACTIVE PORTFOLIO</div>
+                                <div class="metric-number" id="kpiProjectsCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">TOTAL PAYROLL DISBURSED</div>
+                                <div class="metric-number text-success" id="kpiPayrollVal">₹0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#f0edff; color:#6366f1;">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">INVENTORY VALUATION</div>
+                                <div class="metric-number text-primary" id="kpiMaterialsVal">₹0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fee2e2; color:#ef4444;">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">OPEN SITE INCIDENTS</div>
+                                <div class="metric-number text-danger" id="kpiOpenIssuesCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reporting Section Tabs -->
+                <div class="d-flex align-items-center gap-2 border-bottom mb-4 report-tabs-nav">
+                    <button type="button" class="report-tab-btn active" id="tabProjectsBtn" onclick="switchReportTab('projects')">
+                        <i class="bi bi-buildings"></i> Projects Portfolio (<span id="countProjectsBadge">0</span>)
+                    </button>
+                    <button type="button" class="report-tab-btn" id="tabWorkforceBtn" onclick="switchReportTab('workforce')">
+                        <i class="bi bi-people"></i> Workforce Roster (<span id="countWorkersBadge">0</span>)
+                    </button>
+                    <button type="button" class="report-tab-btn" id="tabTasksBtn" onclick="switchReportTab('tasks')">
+                        <i class="bi bi-check2-square"></i> Work Orders (<span id="countTasksBadge">0</span>)
+                    </button>
+                    <button type="button" class="report-tab-btn" id="tabMaterialsBtn" onclick="switchReportTab('materials')">
+                        <i class="bi bi-box-seam"></i> Inventory Stock (<span id="countMaterialsBadge">0</span>)
+                    </button>
+                </div>
+
+                <!-- TAB 1: PROJECTS REPORT -->
+                <div id="sectionProjectsReport">
+                    <div class="saas-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Projects Performance Dossier</h3>
+                                <div class="saas-card-sub">Site locations, supervising engineers, assigned budgets, and completion percentages</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="saas-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>CODE</th>
+                                        <th>PROJECT NAME</th>
+                                        <th>LOCATION</th>
+                                        <th>SUPERVISING ENGINEER</th>
+                                        <th>BUDGET ALLOCATION</th>
+                                        <th>PROGRESS</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectsReportTbody">
+                                    <tr><td colspan="7" class="text-center py-4 text-muted">Loading projects report...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: WORKFORCE REPORT -->
+                <div id="sectionWorkforceReport" style="display: none;">
+                    <div class="saas-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Labor &amp; Staff Distribution Ledger</h3>
+                                <div class="saas-card-sub">Registered workforce headcount, daily wage rates, and contact directory</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="saas-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>WORKER CODE</th>
+                                        <th>NAME</th>
+                                        <th>TRADE / ROLE</th>
+                                        <th>PHONE NUMBER</th>
+                                        <th>DAILY WAGE RATE</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workersReportTbody">
+                                    <tr><td colspan="6" class="text-center py-4 text-muted">Loading workforce report...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: TASKS REPORT -->
+                <div id="sectionTasksReport" style="display: none;">
+                    <div class="saas-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Milestone &amp; Work Order Execution</h3>
+                                <div class="saas-card-sub">Assigned tasks, site assignments, priority classifications, and deadlines</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="saas-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>TASK DESCRIPTION</th>
+                                        <th>PROJECT SITE</th>
+                                        <th>ASSIGNED WORKFORCE</th>
+                                        <th>DUE DATE</th>
+                                        <th>PRIORITY</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasksReportTbody">
+                                    <tr><td colspan="6" class="text-center py-4 text-muted">Loading task orders report...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: MATERIALS REPORT -->
+                <div id="sectionMaterialsReport" style="display: none;">
+                    <div class="saas-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Raw Material Inventory Valuation</h3>
+                                <div class="saas-card-sub">Warehouse stocks, units on site, unit costs, and cumulative holding valuation</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="saas-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>MATERIAL ITEM</th>
+                                        <th>CATEGORY</th>
+                                        <th>STOCK QUANTITY</th>
+                                        <th>UNIT RATE</th>
+                                        <th>VALUATION</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materialsReportTbody">
+                                    <tr><td colspan="6" class="text-center py-4 text-muted">Loading materials report...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('reports', !isAdministrator);
+        initAppNavigation('reports');
+
+        let dataStore = {
+            projects: [],
+            workers: [],
+            tasks: [],
+            payroll: [],
+            materials: [],
+            issues: []
+        };
+
+        function switchReportTab(tab) {
+            const tabs = ['projects', 'workforce', 'tasks', 'materials'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+                const sec = document.getElementById(`section${t.charAt(0).toUpperCase() + t.slice(1)}Report`);
+                if (t === tab) {
+                    if (btn) btn.classList.add('active');
+                    if (sec) sec.style.display = 'block';
+                } else {
+                    if (btn) btn.classList.remove('active');
+                    if (sec) sec.style.display = 'none';
+                }
+            });
+        }
+
+        async function fetchSafe(url, key) {
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                return data[key] || [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        async function loadReports() {
+            try {
+                const [prjs, wrks, tsks, pyrl, mats, isss] = await Promise.all([
+                    fetchSafe('/api/projects', 'projects'),
+                    fetchSafe('/api/workers', 'workers'),
+                    fetchSafe('/api/tasks', 'tasks'),
+                    fetchSafe('/api/payroll', 'payroll'),
+                    fetchSafe('/api/materials', 'materials'),
+                    fetchSafe('/api/issues', 'issues')
+                ]);
+
+                dataStore = {
+                    projects: prjs,
+                    workers: wrks,
+                    tasks: tsks,
+                    payroll: pyrl,
+                    materials: mats,
+                    issues: isss
+                };
+
+                // Update KPIs
+                document.getElementById('kpiProjectsCount').textContent = prjs.length;
+                document.getElementById('countProjectsBadge').textContent = prjs.length;
+                document.getElementById('countWorkersBadge').textContent = wrks.length;
+                document.getElementById('countTasksBadge').textContent = tsks.length;
+                document.getElementById('countMaterialsBadge').textContent = mats.length;
+
+                const totalPayroll = pyrl.reduce((sum, p) => sum + Number(p.total_salary || 0), 0);
+                document.getElementById('kpiPayrollVal').textContent = formatCurrency(totalPayroll);
+
+                const totalMats = mats.reduce((sum, m) => sum + Number(m.total_value || 0), 0);
+                document.getElementById('kpiMaterialsVal').textContent = formatCurrency(totalMats);
+
+                const openIssues = isss.filter(i => (i.status || '').toLowerCase() === 'open').length;
+                document.getElementById('kpiOpenIssuesCount').textContent = openIssues;
+
+                renderProjectsReport();
+                renderWorkersReport();
+                renderTasksReport();
+                renderMaterialsReport();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Unable to aggregate reporting data.', 'error');
+            }
+        }
+
+        function renderProjectsReport() {
+            const tbody = document.getElementById('projectsReportTbody');
+            if (dataStore.projects.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No project records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataStore.projects.map(p => {
+                const prog = Math.max(0, Math.min(100, Number(p.progress || 0)));
+                const st = (p.status || '').toLowerCase();
+                let badge = '<span class="saas-badge saas-badge-info">Ongoing</span>';
+                if (st === 'completed') badge = '<span class="saas-badge saas-badge-success">Completed</span>';
+                if (st === 'pending') badge = '<span class="saas-badge saas-badge-warning">Pending</span>';
+
+                return `
+                    <tr>
+                        <td><span class="badge" style="background:#e0f8fc; color:#088199; font-weight:800;">${formatValue(p.projectCode, 'PRJ-' + p.id)}</span></td>
+                        <td><strong style="color:var(--primary);">${formatValue(p.name)}</strong></td>
+                        <td>${formatValue(p.location)}</td>
+                        <td>${formatValue(p.engineer)}</td>
+                        <td class="fw-bold text-success">${formatCurrency(p.budget)}</td>
+                        <td style="min-width: 140px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="saas-progress-track flex-grow-1" style="height:6px;">
+                                    <div class="saas-progress-bar" style="width:${prog}%;"></div>
+                                </div>
+                                <small class="fw-bold">${prog}%</small>
+                            </div>
+                        </td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderWorkersReport() {
+            const tbody = document.getElementById('workersReportTbody');
+            if (dataStore.workers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No worker records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataStore.workers.map(w => {
+                return `
+                    <tr>
+                        <td><span class="badge" style="background:#e0f8fc; color:#088199; font-weight:800;">${formatValue(w.worker_code, 'WRK-' + w.id)}</span></td>
+                        <td><strong style="color:var(--primary);">${formatValue(w.name)}</strong></td>
+                        <td><span class="saas-badge saas-badge-info">${formatValue(w.role)}</span></td>
+                        <td>${formatValue(w.phone)}</td>
+                        <td class="fw-bold text-success">${formatCurrency(w.daily_wage || w.salary)}</td>
+                        <td><span class="saas-badge saas-badge-success">${formatValue(w.status, 'Active')}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTasksReport() {
+            const tbody = document.getElementById('tasksReportTbody');
+            if (dataStore.tasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No task records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataStore.tasks.map(t => {
+                const st = (t.status || 'Pending').toLowerCase();
+                let badge = '<span class="saas-badge saas-badge-warning">Pending</span>';
+                if (st === 'completed') badge = '<span class="saas-badge saas-badge-success">Completed</span>';
+                if (st === 'in progress') badge = '<span class="saas-badge saas-badge-info">In Progress</span>';
+
+                return `
+                    <tr>
+                        <td><strong style="color:var(--primary);">${formatValue(t.task_name || t.name)}</strong></td>
+                        <td><span class="saas-badge saas-badge-info">${formatValue(t.project)}</span></td>
+                        <td>${formatValue(t.assigned_to)}</td>
+                        <td>${formatDate(t.due_date)}</td>
+                        <td><span class="saas-badge saas-badge-warning">${formatValue(t.priority, 'Medium')}</span></td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderMaterialsReport() {
+            const tbody = document.getElementById('materialsReportTbody');
+            if (dataStore.materials.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No material records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataStore.materials.map(m => {
+                const qty = Number(m.quantity || 0);
+                const isLow = qty < 10;
+                return `
+                    <tr>
+                        <td><strong style="color:var(--primary);">${formatValue(m.name)}</strong></td>
+                        <td><span class="saas-badge saas-badge-info">${formatValue(m.category)}</span></td>
+                        <td class="fw-bold ${isLow ? 'text-danger' : ''}">${qty.toLocaleString('en-IN')} ${formatValue(m.unit)}</td>
+                        <td>${formatCurrency(m.unit_price)}</td>
+                        <td class="fw-bold text-success">${formatCurrency(m.total_value)}</td>
+                        <td>${isLow ? '<span class="saas-badge saas-badge-danger">Low Stock</span>' : '<span class="saas-badge saas-badge-success">Adequate</span>'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Init
+        loadReports();
+    </script>
+</body>
+
+</html>

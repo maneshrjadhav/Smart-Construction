@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects Management | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .project-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(8, 43, 58, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(8, 43, 58, 0.09);
+        }
+
+        .project-card-header {
+            background: linear-gradient(135deg, #082B3A 0%, #0c3c52 100%);
+            padding: 18px 20px;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .project-card-code {
+            font-size: 11px;
+            font-weight: 700;
+            color: #27C4E8;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .project-card-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin: 4px 0 2px;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-card-loc {
+            font-size: 12px;
+            color: #94A3B8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .project-card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 12.5px;
+        }
+
+        .project-meta-row:last-child {
+            border-bottom: 0;
+        }
+
+        .project-meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .project-meta-val {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .view-switch-btn {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-switch-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .filter-pill {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: var(--secondary);
+            color: #ffffff;
+            border-color: var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Operations / Projects</div>
+                        <h1 class="page-heading-title">Projects Management</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Construction Projects Roster</h2>
+                        <div class="text-muted" style="font-size: 13px;">Plan, monitor budget allocations, schedules, and active site progress</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-saas-primary" id="addProjectBtn" onclick="openAddModal()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Add New Project</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e8f5f8; color:#0fa8c4;">
+                                <i class="bi bi-buildings"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">TOTAL PROJECTS</div>
+                                <div class="metric-number" id="totalCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">ONGOING SITES</div>
+                                <div class="metric-number" id="ongoingCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fef3c7; color:#f59e0b;">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">PENDING INITIATION</div>
+                                <div class="metric-number" id="pendingCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#f0edff; color:#6366f1;">
+                                <i class="bi bi-pie-chart-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">AVERAGE PROGRESS</div>
+                                <div class="metric-number" id="averageProgress">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="saas-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <!-- Search Box -->
+                        <div class="position-relative flex-grow-1" style="max-width: 380px;">
+                            <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search by project name, location or engineer..." style="font-size: 13px; height: 40px; border-radius: 8px;">
+                        </div>
+
+                        <!-- Status Filter Pills -->
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" class="filter-pill active" onclick="setFilter('all', this)">All</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('ongoing', this)">Ongoing</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('pending', this)">Pending</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('completed', this)">Completed</button>
+                        </div>
+
+                        <!-- Grid / Table View Switcher -->
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="view-switch-btn active" id="viewCardsBtn" onclick="switchView('cards')">
+                                <i class="bi bi-grid-fill"></i> Grid
+                            </button>
+                            <button type="button" class="view-switch-btn" id="viewTableBtn" onclick="switchView('table')">
+                                <i class="bi bi-table"></i> Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Grid Cards Container -->
+                <div id="cardsViewContainer">
+                    <div class="row g-3" id="projectCardsRow">
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <div class="text-muted mt-2" style="font-size: 13px;">Loading projects...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Table View Container -->
+                <div id="tableViewContainer" style="display: none;">
+                    <div class="saas-card">
+                        <div class="table-responsive">
+                            <table class="saas-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>CODE</th>
+                                        <th>PROJECT NAME</th>
+                                        <th>LOCATION</th>
+                                        <th>SUPERVISING ENGINEER</th>
+                                        <th>START DATE</th>
+                                        <th>COMPLETION</th>
+                                        <th>PROGRESS</th>
+                                        <th>STATUS</th>
+                                        <th class="text-end">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectTableBody">
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4 text-muted">Loading projects table...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= ADD / EDIT PROJECT MODAL ================= -->
+    <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <form id="projectForm">
+                    <div class="modal-header text-white" style="background: var(--primary);">
+                        <h5 class="modal-title fw-bold" id="projectModalTitle">Add New Project</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="editId">
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Project Name *</label>
+                                <input type="text" class="form-control" id="projectName" placeholder="e.g. Apex Commercial Towers Phase II" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Project Code</label>
+                                <input type="text" class="form-control" id="projectCode" placeholder="Auto-generated if empty">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Site Location *</label>
+                                <input type="text" class="form-control" id="projectLocation" placeholder="e.g. Sector 62, Noida, NCR" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Supervising Engineer</label>
+                                <select class="form-select" id="projectEngineerSelect">
+                                    <option value="">Select Supervising Engineer</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Allocated Budget (₹)</label>
+                                <input type="number" class="form-control" id="projectBudget" min="0" placeholder="e.g. 5000000">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Current Status</label>
+                                <select class="form-select" id="projectStatus">
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Start Date *</label>
+                                <input type="date" class="form-control" id="projectStartDate" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Expected Completion *</label>
+                                <input type="date" class="form-control" id="projectCompletionDate" required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold d-flex justify-content-between" style="font-size: 12.5px;">
+                                    <span>Work Completion Progress</span>
+                                    <strong id="progressValueLabel" style="color: var(--secondary);">0%</strong>
+                                </label>
+                                <input type="range" class="form-range" id="projectProgress" min="0" max="100" value="0" oninput="document.getElementById('progressValueLabel').textContent = this.value + '%'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary">
+                            <i class="bi bi-check-lg"></i>
+                            <span>Save Project</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW DETAILS MODAL ================= -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <div class="modal-header text-white" style="background: var(--primary);">
+                    <h5 class="modal-title fw-bold" id="viewModalTitle">Project Specification Dossier</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="viewDetailsContent">
+                    <!-- Dynamic details -->
+                </div>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        // Authentication Guard
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Render Unified Sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('projects', !isAdministrator);
+        initAppNavigation('projects');
+
+        // State variables
+        let projects = [];
+        let engineers = [];
+        let currentFilter = 'all';
+        let currentView = 'cards';
+
+        const projectModal = new bootstrap.Modal(document.getElementById('projectModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
+
+        // Load Projects and Engineers from API
+        async function loadProjects() {
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to fetch projects');
+                projects = data.projects || [];
+                renderProjects();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Unable to retrieve projects from server.', 'error');
+            }
+        }
+
+        async function loadEngineers() {
+            try {
+                const res = await fetch('/api/engineers');
+                const data = await res.json();
+                engineers = data.engineers || [];
+                const select = document.getElementById('projectEngineerSelect');
+                select.innerHTML = '<option value="">Select Supervising Engineer</option>';
+                engineers.forEach(eng => {
+                    const opt = document.createElement('option');
+                    opt.value = eng.full_name;
+                    opt.textContent = `${eng.full_name} (${eng.engineer_code || 'Eng'})`;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.warn('Engineers could not be populated into dropdown', err);
+            }
+        }
+
+        // Status Badge Helper
+        function getStatusBadge(status) {
+            const s = (status || '').toLowerCase();
+            if (s === 'completed') return '<span class="saas-badge saas-badge-success"><i class="bi bi-check-circle me-1"></i>Completed</span>';
+            if (s === 'pending') return '<span class="saas-badge saas-badge-warning"><i class="bi bi-clock-history me-1"></i>Pending</span>';
+            return '<span class="saas-badge saas-badge-info"><i class="bi bi-activity me-1"></i>Ongoing</span>';
+        }
+
+        // Filtering logic
+        function getFilteredProjects() {
+            const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            return projects.filter(p => {
+                const matchesQuery = !query ||
+                    (p.name || '').toLowerCase().includes(query) ||
+                    (p.location || '').toLowerCase().includes(query) ||
+                    (p.engineer || '').toLowerCase().includes(query) ||
+                    (p.projectCode || '').toLowerCase().includes(query);
+
+                const matchesFilter = currentFilter === 'all' || (p.status || '').toLowerCase() === currentFilter;
+                return matchesQuery && matchesFilter;
+            });
+        }
+
+        // Render projects in Card and Table views
+        function renderProjects() {
+            const list = getFilteredProjects();
+            const cardsRow = document.getElementById('projectCardsRow');
+            const tableBody = document.getElementById('projectTableBody');
+
+            // 1. Render Cards
+            if (list.length === 0) {
+                cardsRow.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="saas-card py-5">
+                            <i class="bi bi-buildings fs-1 text-muted d-block mb-3"></i>
+                            <h5 class="fw-bold text-muted">No projects found</h5>
+                            <p class="text-muted small mb-3">Try adjusting your search query or status filter.</p>
+                            <button type="button" class="btn-saas-primary" onclick="openAddModal()">
+                                <i class="bi bi-plus-circle"></i> Add First Project
+                            </button>
+                        </div>
+                    </div>
+                `;
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-buildings fs-3 d-block mb-2"></i> No project records match current criteria.
+                        </td>
+                    </tr>
+                `;
+                updateMetrics();
+                return;
+            }
+
+            cardsRow.innerHTML = list.map(p => {
+                const prog = Math.max(0, Math.min(100, Number(p.progress || 0)));
+                return `
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="project-card">
+                            <div class="project-card-header">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="project-card-code">${formatValue(p.projectCode, 'PRJ-' + p.id)}</span>
+                                    <div>${getStatusBadge(p.status)}</div>
+                                </div>
+                                <h3 class="project-card-title" title="${formatValue(p.name)}">${formatValue(p.name)}</h3>
+                                <div class="project-card-loc">
+                                    <i class="bi bi-geo-alt-fill text-info"></i>
+                                    <span>${formatValue(p.location)}</span>
+                                </div>
+                            </div>
+                            <div class="project-card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1 small fw-bold">
+                                        <span class="text-muted">Progress</span>
+                                        <span style="color: var(--secondary);">${prog}%</span>
+                                    </div>
+                                    <div class="saas-progress-track">
+                                        <div class="saas-progress-bar" style="width: ${prog}%;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="project-meta-row">
+                                    <span class="project-meta-label"><i class="bi bi-person me-1"></i> Engineer</span>
+                                    <span class="project-meta-val">${formatValue(p.engineer)}</span>
+                                </div>
+                                <div class="project-meta-row">
+                                    <span class="project-meta-label"><i class="bi bi-wallet2 me-1"></i> Budget</span>
+                                    <span class="project-meta-val text-success">${formatCurrency(p.budget)}</span>
+                                </div>
+                                <div class="project-meta-row">
+                                    <span class="project-meta-label"><i class="bi bi-calendar-event me-1"></i> Target Completion</span>
+                                    <span class="project-meta-val">${formatDate(p.completionDate)}</span>
+                                </div>
+
+                                <div class="d-flex gap-2 mt-auto pt-3">
+                                    <button type="button" class="btn btn-sm btn-light border flex-grow-1" onclick="viewProjectDetails(${p.id})">
+                                        <i class="bi bi-eye"></i> Details
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-light border" onclick="editProject(${p.id})" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    ${isAdministrator ? `
+                                        <button type="button" class="btn btn-sm btn-light border text-danger" onclick="deleteProject(${p.id}, '${escapeHtml(p.name)}')" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 2. Render Table
+            tableBody.innerHTML = list.map(p => {
+                const prog = Math.max(0, Math.min(100, Number(p.progress || 0)));
+                return `
+                    <tr>
+                        <td><span class="badge" style="background:#e0f8fc; color:#088199; font-weight:800;">${formatValue(p.projectCode, 'PRJ-' + p.id)}</span></td>
+                        <td><strong style="color:var(--primary);">${formatValue(p.name)}</strong></td>
+                        <td><i class="bi bi-geo-alt text-muted me-1"></i>${formatValue(p.location)}</td>
+                        <td>${formatValue(p.engineer)}</td>
+                        <td>${formatDate(p.startDate)}</td>
+                        <td>${formatDate(p.completionDate)}</td>
+                        <td style="min-width: 140px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="saas-progress-track flex-grow-1" style="height: 6px;">
+                                    <div class="saas-progress-bar" style="width: ${prog}%;"></div>
+                                </div>
+                                <small class="fw-bold">${prog}%</small>
+                            </div>
+                        </td>
+                        <td>${getStatusBadge(p.status)}</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="viewProjectDetails(${p.id})" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="editProject(${p.id})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            ${isAdministrator ? `
+                                <button type="button" class="btn btn-sm btn-light border p-1 px-2 text-danger" onclick="deleteProject(${p.id}, '${escapeHtml(p.name)}')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const total = projects.length;
+            const ongoing = projects.filter(p => (p.status || '').toLowerCase() === 'ongoing').length;
+            const pending = projects.filter(p => (p.status || '').toLowerCase() === 'pending').length;
+            const avg = total ? Math.round(projects.reduce((sum, p) => sum + Number(p.progress || 0), 0) / total) : 0;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('ongoingCount').textContent = ongoing;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('averageProgress').textContent = avg + '%';
+        }
+
+        function setFilter(f, btn) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            renderProjects();
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const cardsBtn = document.getElementById('viewCardsBtn');
+            const tableBtn = document.getElementById('viewTableBtn');
+            const cardsContainer = document.getElementById('cardsViewContainer');
+            const tableContainer = document.getElementById('tableViewContainer');
+
+            if (view === 'cards') {
+                cardsBtn.classList.add('active');
+                tableBtn.classList.remove('active');
+                cardsContainer.style.display = 'block';
+                tableContainer.style.display = 'none';
+            } else {
+                tableBtn.classList.add('active');
+                cardsBtn.classList.remove('active');
+                tableContainer.style.display = 'block';
+                cardsContainer.style.display = 'none';
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+        }
+
+        function openAddModal() {
+            document.getElementById('projectModalTitle').textContent = 'Add New Project';
+            document.getElementById('projectForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('projectProgress').value = 0;
+            document.getElementById('progressValueLabel').textContent = '0%';
+            document.getElementById('projectStatus').value = 'ongoing';
+            projectModal.show();
+        }
+
+        function editProject(id) {
+            const p = projects.find(x => Number(x.id) === Number(id));
+            if (!p) return;
+
+            document.getElementById('projectModalTitle').textContent = 'Edit Project Details';
+            document.getElementById('editId').value = p.id;
+            document.getElementById('projectName').value = p.name || '';
+            document.getElementById('projectCode').value = p.projectCode || '';
+            document.getElementById('projectLocation').value = p.location || '';
+            document.getElementById('projectEngineerSelect').value = p.engineer || '';
+            document.getElementById('projectBudget').value = p.budget || '';
+
+            // Handle date string to YYYY-MM-DD
+            if (p.startDate) {
+                const s = new Date(p.startDate);
+                if (!isNaN(s.getTime())) document.getElementById('projectStartDate').value = s.toISOString().split('T')[0];
+            } else {
+                document.getElementById('projectStartDate').value = '';
+            }
+
+            if (p.completionDate) {
+                const c = new Date(p.completionDate);
+                if (!isNaN(c.getTime())) document.getElementById('projectCompletionDate').value = c.toISOString().split('T')[0];
+            } else {
+                document.getElementById('projectCompletionDate').value = '';
+            }
+
+            document.getElementById('projectStatus').value = (p.status || 'ongoing').toLowerCase();
+            const prog = Number(p.progress || 0);
+            document.getElementById('projectProgress').value = prog;
+            document.getElementById('progressValueLabel').textContent = prog + '%';
+
+            projectModal.show();
+        }
+
+        function viewProjectDetails(id) {
+            const p = projects.find(x => Number(x.id) === Number(id));
+            if (!p) return;
+
+            const prog = Math.max(0, Math.min(100, Number(p.progress || 0)));
+            document.getElementById('viewDetailsContent').innerHTML = `
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <span class="badge mb-2" style="background:#e0f8fc; color:#088199; font-weight:800; font-size:12px;">${formatValue(p.projectCode, 'PRJ-' + p.id)}</span>
+                        <h4 class="fw-bold mb-1" style="color:var(--primary);">${formatValue(p.name)}</h4>
+                        <div class="text-muted"><i class="bi bi-geo-alt-fill text-info me-1"></i> ${formatValue(p.location)}</div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        ${getStatusBadge(p.status)}
+                    </div>
+
+                    <div class="col-12"><hr class="my-2"></div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Supervising Site Engineer</div>
+                        <div class="fw-bold fs-6">${formatValue(p.engineer)}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Allocated Project Budget</div>
+                        <div class="fw-bold fs-6 text-success">${formatCurrency(p.budget)}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Project Kickoff Date</div>
+                        <div class="fw-bold fs-6">${formatDate(p.startDate)}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Target Completion Date</div>
+                        <div class="fw-bold fs-6">${formatDate(p.completionDate)}</div>
+                    </div>
+
+                    <div class="col-12 mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small fw-bold">Overall Progress Completion</span>
+                            <span class="fw-bold" style="color:var(--secondary);">${prog}%</span>
+                        </div>
+                        <div class="saas-progress-track" style="height: 10px;">
+                            <div class="saas-progress-bar" style="width: ${prog}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            viewModal.show();
+        }
+
+        // Form Submit: Save Project (Add / Edit)
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const payload = {
+                name: document.getElementById('projectName').value.trim(),
+                project_code: document.getElementById('projectCode').value.trim(),
+                location: document.getElementById('projectLocation').value.trim(),
+                engineer: document.getElementById('projectEngineerSelect').value.trim(),
+                budget: Number(document.getElementById('projectBudget').value || 0),
+                startDate: document.getElementById('projectStartDate').value,
+                completionDate: document.getElementById('projectCompletionDate').value,
+                status: document.getElementById('projectStatus').value,
+                progress: Number(document.getElementById('projectProgress').value || 0)
+            };
+
+            try {
+                const url = id ? `/api/projects/${id}` : '/api/projects';
+                const method = id ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save project');
+
+                projectModal.hide();
+                showToast('Success', id ? 'Project details updated successfully.' : 'New project added successfully.', 'success');
+                await loadProjects();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to save project.', 'error');
+            }
+        });
+
+        // Delete Project (Admin only)
+        async function deleteProject(id, name) {
+            if (!isAdministrator) {
+                showToast('Restricted', 'Only Administrators can delete projects.', 'warning');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) return;
+
+            try {
+                const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete project');
+
+                showToast('Deleted', 'Project removed from system.', 'info');
+                await loadProjects();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to delete project.', 'error');
+            }
+        }
+
+        // Search Input Listener
+        document.getElementById('searchInput').addEventListener('input', renderProjects);
+
+        // Initialization
+        loadProjects();
+        loadEngineers();
+    </script>
+</body>
+
+</html>

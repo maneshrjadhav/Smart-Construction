@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Tracking | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .status-btn-group {
+            display: inline-flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-choice-btn {
+            border: 0;
+            background: #ffffff;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 5px 10px;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border-color);
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .status-choice-btn:last-child {
+            border-right: 0;
+        }
+
+        .status-choice-btn.selected-Present {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .status-choice-btn.selected-Absent {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .status-choice-btn.selected-Leave {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .status-choice-btn.selected-Late {
+            background: #6366f1;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Operations / Attendance</div>
+                        <h1 class="page-heading-title">Daily Workforce Attendance</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Site Attendance Register</h2>
+                        <div class="text-muted" style="font-size: 13px;">Log daily presence, absences, and leaves for active construction workforce</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="markAllPresent()" style="font-weight: 600; border-radius: 8px;">
+                            <i class="bi bi-check-all me-1"></i> Mark All Present
+                        </button>
+                        <button type="button" class="btn-saas-primary" onclick="saveAttendance()">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <span>Save Attendance</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Selector & Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="saas-card h-100 d-flex flex-column justify-content-center p-3">
+                            <label class="form-label fw-bold small text-muted mb-1">RECORDING DATE</label>
+                            <input type="date" class="form-control fw-bold" id="attendanceDate" onchange="onDateChange()" style="border-radius: 8px; font-size: 13.5px;">
+                            <small class="text-muted mt-1" id="formattedDateLabel">—</small>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">PRESENT WORKERS</div>
+                                <div class="metric-number text-success" id="presentCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fee2e2; color:#ef4444;">
+                                <i class="bi bi-person-x-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">ABSENT WORKERS</div>
+                                <div class="metric-number text-danger" id="absentCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fef3c7; color:#f59e0b;">
+                                <i class="bi bi-calendar-minus"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">ON LEAVE / LATE</div>
+                                <div class="metric-number text-warning" id="leaveCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div class="saas-card mb-4">
+                    <div class="position-relative" style="max-width: 400px;">
+                        <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search by worker name, code, or trade..." style="font-size: 13px; height: 40px; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <!-- Attendance Table Card -->
+                <div class="saas-card">
+                    <div class="table-responsive">
+                        <table class="saas-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>WORKER CODE</th>
+                                    <th>WORKER NAME</th>
+                                    <th>TRADE / ROLE</th>
+                                    <th>CONTACT</th>
+                                    <th>DAILY WAGE</th>
+                                    <th class="text-center">ATTENDANCE STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Loading workforce roster...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Initialize sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('attendance', !isAdministrator);
+        initAppNavigation('attendance');
+
+        // State
+        let allWorkers = [];
+        let attendanceMap = {}; // workerId -> 'Present' | 'Absent' | 'Leave' | 'Late'
+        let existingAttendanceRecords = [];
+
+        // Set default date to today
+        const dateInput = document.getElementById('attendanceDate');
+        const todayIso = new Date().toISOString().split('T')[0];
+        dateInput.value = todayIso;
+        updateDateLabel(todayIso);
+
+        function updateDateLabel(iso) {
+            document.getElementById('formattedDateLabel').textContent = formatDate(iso);
+        }
+
+        async function loadWorkforceAndAttendance() {
+            try {
+                // Fetch workers
+                const wRes = await fetch('/api/workers');
+                const wData = await wRes.json();
+                allWorkers = wData.workers || [];
+
+                // Fetch existing attendance
+                const aRes = await fetch('/api/attendance');
+                const aData = await aRes.json();
+                existingAttendanceRecords = aData.attendance || [];
+
+                syncAttendanceForSelectedDate();
+                renderAttendanceTable();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Failed to retrieve attendance records from server.', 'error');
+            }
+        }
+
+        function syncAttendanceForSelectedDate() {
+            const selectedDate = dateInput.value;
+            attendanceMap = {};
+
+            // Find records for this specific date
+            const dateRecords = existingAttendanceRecords.filter(r => {
+                if (!r.date) return false;
+                const dIso = new Date(r.date).toISOString().split('T')[0];
+                return dIso === selectedDate;
+            });
+
+            // Populate attendance map
+            allWorkers.forEach(w => {
+                const match = dateRecords.find(r => Number(r.worker_id) === Number(w.id));
+                attendanceMap[w.id] = match ? match.status : 'Present';
+            });
+
+            updateMetrics();
+        }
+
+        function onDateChange() {
+            updateDateLabel(dateInput.value);
+            syncAttendanceForSelectedDate();
+            renderAttendanceTable();
+        }
+
+        function markAllPresent() {
+            allWorkers.forEach(w => {
+                attendanceMap[w.id] = 'Present';
+            });
+            renderAttendanceTable();
+            updateMetrics();
+            showToast('Batch Action', 'All workers marked as Present.', 'info');
+        }
+
+        function setStatus(workerId, status) {
+            attendanceMap[workerId] = status;
+            renderAttendanceTable();
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const values = Object.values(attendanceMap);
+            const present = values.filter(v => v === 'Present').length;
+            const absent = values.filter(v => v === 'Absent').length;
+            const leave = values.filter(v => v === 'Leave' || v === 'Late').length;
+
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('leaveCount').textContent = leave;
+        }
+
+        function renderAttendanceTable() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const filteredWorkers = allWorkers.filter(w => {
+                const name = (w.name || '').toLowerCase();
+                const code = (w.worker_code || '').toLowerCase();
+                const role = (w.role || '').toLowerCase();
+                return !q || name.includes(q) || code.includes(q) || role.includes(q);
+            });
+
+            const tbody = document.getElementById('attendanceTableBody');
+            if (filteredWorkers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-people fs-2 d-block mb-2"></i> No worker records match search criteria.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredWorkers.map(w => {
+                const currentStatus = attendanceMap[w.id] || 'Present';
+                const wage = formatCurrency(w.daily_wage || w.salary);
+
+                return `
+                    <tr>
+                        <td><span class="badge" style="background:#e0f8fc; color:#088199; font-weight:800;">${formatValue(w.worker_code, 'WRK-' + w.id)}</span></td>
+                        <td>
+                            <strong style="color:var(--primary);">${formatValue(w.name)}</strong>
+                        </td>
+                        <td><span class="saas-badge saas-badge-info">${formatValue(w.role)}</span></td>
+                        <td>${formatValue(w.phone)}</td>
+                        <td class="fw-bold text-success">${wage}</td>
+                        <td class="text-center">
+                            <div class="status-btn-group">
+                                <button type="button" class="status-choice-btn ${currentStatus === 'Present' ? 'selected-Present' : ''}" onclick="setStatus(${w.id}, 'Present')">
+                                    <i class="bi bi-check-circle me-1"></i>Present
+                                </button>
+                                <button type="button" class="status-choice-btn ${currentStatus === 'Absent' ? 'selected-Absent' : ''}" onclick="setStatus(${w.id}, 'Absent')">
+                                    <i class="bi bi-x-circle me-1"></i>Absent
+                                </button>
+                                <button type="button" class="status-choice-btn ${currentStatus === 'Leave' ? 'selected-Leave' : ''}" onclick="setStatus(${w.id}, 'Leave')">
+                                    <i class="bi bi-clock me-1"></i>Leave
+                                </button>
+                                <button type="button" class="status-choice-btn ${currentStatus === 'Late' ? 'selected-Late' : ''}" onclick="setStatus(${w.id}, 'Late')">
+                                    <i class="bi bi-exclamation-circle me-1"></i>Late
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function saveAttendance() {
+            const date = dateInput.value;
+            if (!date) {
+                showToast('Validation Error', 'Please choose an attendance date.', 'warning');
+                return;
+            }
+
+            const records = allWorkers.map(w => ({
+                worker_id: w.id,
+                worker_name: w.name,
+                status: attendanceMap[w.id] || 'Present'
+            }));
+
+            try {
+                const res = await fetch('/api/attendance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, records })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save attendance');
+
+                showToast('Saved', `Attendance for ${formatDate(date)} saved successfully.`, 'success');
+                // Refresh records
+                const aRes = await fetch('/api/attendance');
+                const aData = await aRes.json();
+                existingAttendanceRecords = aData.attendance || [];
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to save attendance.', 'error');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderAttendanceTable);
+
+        // Initialize
+        loadWorkforceAndAttendance();
+    </script>
+</body>
+
+</html>

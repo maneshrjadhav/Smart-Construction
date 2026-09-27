@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Dashboard | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .quick-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notification-dropdown-menu {
+            width: 340px;
+            max-height: 420px;
+            overflow-y: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            padding: 0;
+        }
+
+        .notification-dropdown-header {
+            padding: 14px 18px;
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notification-item-card {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .notification-item-card:hover {
+            background: #F8FCFE;
+        }
+
+        .notification-item-card.unread {
+            background: #F0FBFE;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .progress-bar-custom {
+            height: 7px;
+            border-radius: 6px;
+            background: #EDF2F6;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0FA8C4, #27C4E8);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Unified Sidebar -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Management Console</div>
+                        <h1 class="page-heading-title">Administrator Dashboard</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- Notifications Dropdown -->
+                    <div class="dropdown">
+                        <button type="button" class="notification-bell-btn" id="notificationDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge" id="notificationDot" style="display: none;"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown-menu" aria-labelledby="notificationDropdownBtn">
+                            <div class="notification-dropdown-header">
+                                <strong style="font-size: 13px; color: var(--text-navy);">Site Notifications</strong>
+                                <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" id="markAllNotificationsReadBtn" style="font-size: 11px; color: var(--secondary);">
+                                    Mark all as read
+                                </button>
+                            </div>
+                            <div id="notificationsList">
+                                <div class="text-center text-muted py-4" style="font-size: 11.5px;">
+                                    <i class="bi bi-bell-slash fs-4 d-block mb-1"></i> No unread notifications
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile -->
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">AD</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">Administrator</strong>
+                            <span id="topbarUserRole">System Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+                <!-- Welcome Banner & Quick Actions -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="mb-1" style="font-size: 24px; font-weight: 800;">
+                            Welcome back, <span id="adminGreetingName">Administrator</span>
+                        </h2>
+                        <p class="text-muted mb-0" style="font-size: 13px;">
+                            Here is the high-level overview of construction operations across all sites.
+                        </p>
+                    </div>
+
+                    <div class="quick-actions-bar">
+                        <a href="projects.html" class="btn-saas-secondary">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Add Project</span>
+                        </a>
+                        <a href="workers.html" class="btn-saas-secondary">
+                            <i class="bi bi-person-plus"></i>
+                            <span>Add Worker</span>
+                        </a>
+                        <a href="workers.html#engineers" class="btn-saas-primary admin-only-feature">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Add Engineer</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Key Stat Cards (8 Metrics) -->
+                <div class="row g-3 mb-4">
+                    <!-- Total Projects -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-navy"><i class="bi bi-buildings"></i></div>
+                                <span class="saas-badge saas-badge-info">Active</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="totalProjectsCount">01</div>
+                                <div class="stat-title">Total Projects</div>
+                                <div class="stat-footer-text">Operational sites</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Workforce -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-teal"><i class="bi bi-people"></i></div>
+                                <span class="saas-badge saas-badge-success">Registered</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="totalWorkforceCount">02</div>
+                                <div class="stat-title">Total Workforce</div>
+                                <div class="stat-footer-text">Laborers &amp; specialists</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Tasks -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-green"><i class="bi bi-check2-square"></i></div>
+                                <span class="saas-badge saas-badge-warning" id="pendingTasksBadge">In Progress</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="totalTasksCount">01</div>
+                                <div class="stat-title">Total Tasks</div>
+                                <div class="stat-footer-text" id="completedTasksFooter">0 Completed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Open Site Issues -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-danger"><i class="bi bi-exclamation-triangle"></i></div>
+                                <span class="saas-badge saas-badge-danger" id="openIssuesBadge">Active</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="openIssuesCount">00</div>
+                                <div class="stat-title">Open Site Issues</div>
+                                <div class="stat-footer-text">Safety &amp; bottleneck reports</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Tasks -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-green"><i class="bi bi-clipboard2-check"></i></div>
+                                <span class="saas-badge saas-badge-success">Milestones</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="completedTasksCount">01</div>
+                                <div class="stat-title">Completed Tasks</div>
+                                <div class="stat-footer-text">Quality inspected</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Attendance -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-teal"><i class="bi bi-calendar-check"></i></div>
+                                <span class="saas-badge saas-badge-info">Daily</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="attendanceCount">00</div>
+                                <div class="stat-title">Today's Attendance</div>
+                                <div class="stat-footer-text">Workers present today</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Material Alerts -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-amber"><i class="bi bi-box-seam"></i></div>
+                                <span class="saas-badge saas-badge-warning">Inventory</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="materialAlertsCount">00</div>
+                                <div class="stat-title">Material Alerts</div>
+                                <div class="stat-footer-text">Low-stock inventory notifications</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Payroll -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-purple"><i class="bi bi-currency-rupee"></i></div>
+                                <span class="saas-badge saas-badge-purple">Expenditure</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="monthlyPayrollAmount">₹0</div>
+                                <div class="stat-title">Monthly Payroll</div>
+                                <div class="stat-footer-text">Total wage disbursements</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split Row: Project Progress & Site Alerts & Recent Activity -->
+                <div class="row g-4 mb-4">
+                    <!-- Project Progress Overview -->
+                    <div class="col-lg-5">
+                        <div class="saas-card h-100">
+                            <div class="saas-card-header">
+                                <div>
+                                    <h3 class="saas-card-title">Project Execution Progress</h3>
+                                    <div class="saas-card-sub">Current completion across active sites</div>
+                                </div>
+                                <a href="projects.html" class="btn-saas-secondary py-1 px-2" style="font-size: 11px;">
+                                    View All
+                                </a>
+                            </div>
+
+                            <div id="projectProgressList">
+                                <div class="text-center text-muted py-4">
+                                    <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading project progress...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Site Alerts & Issues -->
+                    <div class="col-lg-3">
+                        <div class="saas-card h-100">
+                            <div class="saas-card-header">
+                                <div>
+                                    <h3 class="saas-card-title">Site Alerts</h3>
+                                    <div class="saas-card-sub">Urgent notifications</div>
+                                </div>
+                                <a href="issues.html" class="btn-saas-secondary py-1 px-2" style="font-size: 11px;">
+                                    Issues
+                                </a>
+                            </div>
+
+                            <div id="siteAlertsList">
+                                <div class="text-center text-muted py-4">
+                                    <i class="bi bi-shield-check text-success fs-4 d-block mb-1"></i> No critical alerts
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Feed -->
+                    <div class="col-lg-4">
+                        <div class="saas-card h-100">
+                            <div class="saas-card-header">
+                                <div>
+                                    <h3 class="saas-card-title">Recent Activity</h3>
+                                    <div class="saas-card-sub">Audit trail of site updates</div>
+                                </div>
+                            </div>
+
+                            <div id="recentActivityList">
+                                <div class="text-center text-muted py-4">
+                                    <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading activity...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        // Auth Check
+        const user = requireAuth(['Administrator', 'Admin']);
+
+        // Initialize sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('dashboard', false);
+        initAppNavigation('dashboard');
+
+        if (user) {
+            document.getElementById('adminGreetingName').textContent = user.name || 'Administrator';
+        }
+
+        // Dashboard Data Loading
+        async function loadAdminDashboardData() {
+            try {
+                // Fetch all endpoints concurrently
+                const [
+                    projectsRes,
+                    workersRes,
+                    tasksRes,
+                    attendanceRes,
+                    payrollRes,
+                    materialsRes,
+                    issuesRes,
+                    progressRes
+                ] = await Promise.all([
+                    fetch('/api/projects').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/workers').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/tasks').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/attendance').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/payroll').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/materials').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/issues').then(r => r.json()).catch(() => ({ success: false })),
+                    fetch('/api/progress').then(r => r.json()).catch(() => ({ success: false }))
+                ]);
+
+                const projects = projectsRes.projects || [];
+                const workers = workersRes.workers || [];
+                const tasks = tasksRes.tasks || [];
+                const attendance = attendanceRes.attendance || [];
+                const payroll = payrollRes.payroll || [];
+                const materials = materialsRes.materials || [];
+                const issues = issuesRes.issues || [];
+                const progressReports = progressRes.progress || [];
+
+                // 1. Projects
+                document.getElementById('totalProjectsCount').textContent = String(projects.length).padStart(2, '0');
+
+                // 2. Workforce
+                document.getElementById('totalWorkforceCount').textContent = String(workers.length).padStart(2, '0');
+
+                // 3. Tasks
+                document.getElementById('totalTasksCount').textContent = String(tasks.length).padStart(2, '0');
+                const completedTasks = tasks.filter(t => (t.status || '').toLowerCase() === 'completed');
+                document.getElementById('completedTasksCount').textContent = String(completedTasks.length).padStart(2, '0');
+                document.getElementById('completedTasksFooter').textContent = `${completedTasks.length} Completed`;
+
+                // 4. Issues
+                const openIssues = issues.filter(i => (i.status || '').toLowerCase() !== 'resolved');
+                document.getElementById('openIssuesCount').textContent = String(openIssues.length).padStart(2, '0');
+
+                // 5. Attendance (Today)
+                const todayStr = new Date().toISOString().split('T')[0];
+                const presentToday = attendance.filter(a => {
+                    const d = (a.date || '').split('T')[0];
+                    return (a.status || '').toLowerCase() === 'present' && d === todayStr;
+                });
+                document.getElementById('attendanceCount').textContent = String(presentToday.length).padStart(2, '0');
+
+                // 6. Material Alerts (Low Stock)
+                const lowStock = materials.filter(m => Number(m.quantity) < 20);
+                document.getElementById('materialAlertsCount').textContent = String(lowStock.length).padStart(2, '0');
+
+                // 7. Monthly Payroll
+                const totalPayroll = payroll.reduce((sum, p) => sum + (Number(p.total_salary) || 0), 0);
+                document.getElementById('monthlyPayrollAmount').textContent = formatCurrency(totalPayroll);
+
+                // Render Project Progress
+                const progressContainer = document.getElementById('projectProgressList');
+                if (projects.length === 0) {
+                    progressContainer.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-buildings fs-4 d-block mb-1"></i> No projects added yet.
+                        </div>
+                    `;
+                } else {
+                    progressContainer.innerHTML = projects.slice(0, 5).map(p => {
+                        const prog = Math.max(0, Math.min(100, Number(p.progress) || 0));
+                        return `
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold" style="font-size: 13px; color: var(--text-navy);">${formatValue(p.name)}</span>
+                                    <span class="fw-bold text-info" style="font-size: 12px;">${prog}%</span>
+                                </div>
+                                <div class="progress-bar-custom">
+                                    <div class="progress-bar-fill" style="width: ${prog}%;"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Render Site Alerts
+                const alertsContainer = document.getElementById('siteAlertsList');
+                if (openIssues.length === 0) {
+                    alertsContainer.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-shield-check text-success fs-4 d-block mb-1"></i>
+                            <span style="font-size: 12px;">No open site issues</span>
+                        </div>
+                    `;
+                } else {
+                    alertsContainer.innerHTML = openIssues.slice(0, 4).map(issue => `
+                        <div class="d-flex align-items-start gap-2 mb-3 pb-2 border-bottom">
+                            <i class="bi bi-exclamation-triangle-fill text-warning mt-1"></i>
+                            <div>
+                                <strong style="font-size: 12.5px; color: var(--text-navy); display: block;">${formatValue(issue.title)}</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">${formatValue(issue.project)} • ${formatDate(issue.date)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Render Recent Activity
+                const activityContainer = document.getElementById('recentActivityList');
+                const activityItems = [];
+
+                projects.slice(0, 2).forEach(p => {
+                    activityItems.push({
+                        icon: 'bi-buildings',
+                        title: `Project: ${p.name || 'Site'}`,
+                        sub: `Location: ${p.location || 'Site office'} • ${formatDate(p.created_at || p.startDate)}`
+                    });
+                });
+
+                tasks.slice(0, 2).forEach(t => {
+                    activityItems.push({
+                        icon: 'bi-check2-square',
+                        title: `Task: ${t.task_name || 'Assignment'}`,
+                        sub: `Assigned to: ${t.assigned_to || 'Team'} • Due: ${formatDate(t.due_date)}`
+                    });
+                });
+
+                issues.slice(0, 2).forEach(i => {
+                    activityItems.push({
+                        icon: 'bi-exclamation-circle',
+                        title: `Issue: ${i.title}`,
+                        sub: `Status: ${i.status} • Priority: ${i.priority}`
+                    });
+                });
+
+                if (activityItems.length === 0) {
+                    activityContainer.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-activity fs-4 d-block mb-1"></i> No recent activity recorded.
+                        </div>
+                    `;
+                } else {
+                    activityContainer.innerHTML = activityItems.slice(0, 5).map(act => `
+                        <div class="d-flex align-items-start gap-2 mb-3 pb-2 border-bottom">
+                            <div class="stat-icon-box stat-icon-teal" style="width: 32px; height: 32px; font-size: 14px;">
+                                <i class="bi ${act.icon}"></i>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <strong class="text-truncate d-block" style="font-size: 12.5px; color: var(--text-navy);">${formatValue(act.title)}</strong>
+                                <span class="text-truncate d-block" style="font-size: 11px; color: var(--text-muted);">${act.sub}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Setup Notifications Dropdown
+                setupDashboardNotifications(openIssues, lowStock, projects);
+
+            } catch (err) {
+                console.error('Error loading admin dashboard:', err);
+                showToast('Notice', 'Unable to sync some dashboard components.', 'warning');
+            }
+        }
+
+        function setupDashboardNotifications(issues, lowStock, projects) {
+            const listEl = document.getElementById('notificationsList');
+            const dotEl = document.getElementById('notificationDot');
+            const items = [];
+
+            issues.slice(0, 5).forEach(i => {
+                items.push({
+                    title: `Site Issue: ${i.title}`,
+                    text: `Project: ${i.project || 'Site'} • Priority: ${i.priority}`,
+                    unread: true
+                });
+            });
+
+            lowStock.slice(0, 3).forEach(m => {
+                items.push({
+                    title: `Low Stock: ${m.name}`,
+                    text: `Current quantity: ${m.quantity} ${m.unit || ''}`,
+                    unread: true
+                });
+            });
+
+            if (items.length > 0) {
+                dotEl.style.display = 'block';
+                listEl.innerHTML = items.map(item => `
+                    <div class="notification-item-card ${item.unread ? 'unread' : ''}">
+                        <strong style="font-size: 12px; color: var(--text-navy); display: block;">${item.title}</strong>
+                        <span style="font-size: 11px; color: var(--text-muted);">${item.text}</span>
+                    </div>
+                `).join('');
+            } else {
+                dotEl.style.display = 'none';
+                listEl.innerHTML = `
+                    <div class="text-center text-muted py-4" style="font-size: 11.5px;">
+                        <i class="bi bi-bell-slash fs-4 d-block mb-1"></i> No unread notifications
+                    </div>
+                `;
+            }
+
+            document.getElementById('markAllNotificationsReadBtn').addEventListener('click', () => {
+                dotEl.style.display = 'none';
+                document.querySelectorAll('.notification-item-card').forEach(c => c.classList.remove('unread'));
+                showToast('Success', 'All notifications marked as read.', 'success');
+            });
+        }
+
+        loadAdminDashboardData();
+    </script>
+</body>
+
+</html>

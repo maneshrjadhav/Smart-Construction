@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Construction - Centralized construction project and workforce management system designed to simplify project planning, workforce tracking, materials, attendance, and site progress.">
+    <title>Smart Construction | Project Management System</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #082B3A;
+            --primary-dark: #051826;
+            --primary-light: #0B3042;
+            --secondary: #0FA8C4;
+            --accent: #27C4E8;
+
+            --bg-page: #F4F8FB;
+            --bg-card: #FFFFFF;
+            --bg-alt: #EDF3F7;
+
+            --text-navy: #102A3A;
+            --text-body: #475A68;
+            --text-muted: #6B8291;
+
+            --border-color: #E2EBF0;
+            --nav-height: 76px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        section[id] {
+            scroll-margin-top: calc(var(--nav-height) + 14px);
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            min-height: var(--nav-height);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(8, 43, 58, 0.05);
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0;
+            color: var(--text-navy) !important;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+            box-shadow: 0 6px 18px rgba(15, 168, 196, 0.28);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-navy);
+        }
+
+        .brand-text small {
+            display: block;
+            color: var(--text-muted);
+            font-size: 8.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            margin-top: 2px;
+        }
+
+        .nav-link {
+            color: var(--text-body) !important;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin: 0 3px;
+            padding: 8px 14px !important;
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary) !important;
+            background: rgba(15, 168, 196, 0.07);
+        }
+
+        .login-btn {
+            border: 0;
+            color: #ffffff !important;
+            padding: 10px 22px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+            box-shadow: 0 6px 18px rgba(15, 168, 196, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(15, 168, 196, 0.35);
+        }
+
+        /* ================= HERO SECTION ================= */
+        .hero {
+            position: relative;
+            background: linear-gradient(140deg, #051826 0%, #082B3A 40%, #0B3D56 75%, #0F6880 100%);
+            color: #ffffff;
+            padding: 85px 0 100px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+            background-size: 26px 26px;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(15, 168, 196, 0.18) 0%, rgba(15, 168, 196, 0) 70%);
+            top: -120px;
+            right: -100px;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 15px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(8px);
+            color: #C9F5FF;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            color: #ffffff;
+            font-size: clamp(34px, 4.3vw, 54px);
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 .text-highlight {
+            background: linear-gradient(135deg, var(--accent) 0%, #38BDF8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-description {
+            color: #C5DBE6;
+            font-size: 15px;
+            line-height: 1.75;
+            max-width: 530px;
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 34px;
+        }
+
+        .primary-btn {
+            border: 0;
+            padding: 13px 26px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            color: #ffffff !important;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(15, 168, 196, 0.32);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(15, 168, 196, 0.45);
+        }
+
+        .secondary-btn {
+            padding: 12px 24px;
+            border-radius: 9px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+            color: #ffffff !important;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-2px);
+        }
+
+        .hero-features-list {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .hero-feature-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #D1E5EF;
+        }
+
+        .hero-feature-item i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        /* ================= HERO REALISTIC IMAGE & PREVIEW ================= */
+        .hero-visual-card {
+            position: relative;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 28px 75px rgba(2, 14, 23, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-visual-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9.5;
+            background: #0B3042;
+        }
+
+        .hero-construction-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8, 43, 58, 0.1) 0%, rgba(8, 43, 58, 0.65) 100%);
+            pointer-events: none;
+        }
+
+        .hero-floating-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-navy);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+
+        .hero-floating-metrics {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: rgba(8, 43, 58, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            color: #ffffff;
+        }
+
+        .metric-mini-item {
+            text-align: center;
+        }
+
+        .metric-mini-val {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1.1;
+        }
+
+        .metric-mini-lbl {
+            font-size: 9px;
+            color: #C5DBE6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ================= STATS SECTION ================= */
+        .stats-section {
+            background: #ffffff;
+            padding: 55px 0;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(8, 43, 58, 0.03);
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .stat-box:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: #E2EBF0;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--text-navy);
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-number span {
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 1.2px;
+            margin-top: 6px;
+            text-transform: uppercase;
+        }
+
+        /* ================= GENERAL SECTION ================= */
+        .section {
+            padding: 95px 0;
+        }
+
+        .section-label {
+            display: inline-block;
+            color: var(--secondary);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--text-navy);
+            letter-spacing: -0.5px;
+            margin-bottom: 14px;
+        }
+
+        .section-description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 620px;
+        }
+
+        /* ================= FEATURES SECTION (8 Cards) ================= */
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px 22px;
+            height: 100%;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 0 2px 8px rgba(8, 43, 58, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 16px 36px rgba(15, 168, 196, 0.12);
+        }
+
+        .feature-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EAF8FA;
+            color: var(--secondary);
+            font-size: 20px;
+            margin-bottom: 18px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .feature-card:hover .feature-icon-wrapper {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            color: #ffffff;
+        }
+
+        .feature-card h5 {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--text-navy);
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.65;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        /* ================= MODULES SECTION (9 Informational Cards) ================= */
+        .modules-section {
+            background: var(--bg-alt);
+        }
+
+        .module-card {
+            background: #ffffff;
+            border: 1px solid #DCE6ED;
+            padding: 20px 18px;
+            border-radius: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            height: 100%;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 3px 12px rgba(8, 43, 58, 0.03);
+            user-select: none;
+            cursor: default;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--secondary);
+            box-shadow: 0 12px 28px rgba(15, 168, 196, 0.10);
+        }
+
+        .module-icon-box {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EAF8FA;
+            color: var(--secondary);
+            font-size: 20px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .module-card:hover .module-icon-box {
+            background: var(--secondary);
+            color: #ffffff;
+        }
+
+        .module-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .module-body-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+
+        .module-card h6 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-navy);
+        }
+
+        .module-badge {
+            font-size: 8px;
+            font-weight: 700;
+            color: #0284C7;
+            background: #E0F2FE;
+            padding: 2px 7px;
+            border-radius: 5px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .module-card p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .module-lock-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9.5px;
+            color: #8DA2AD;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        /* ================= ABOUT SECTION ================= */
+        .about-section {
+            background: #ffffff;
+        }
+
+        .about-text h2 {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--text-navy);
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 18px;
+        }
+
+        .about-text p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+
+        .about-box-wrapper {
+            background: #F8FAFC;
+            border: 1px solid #E1EAF0;
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .benefit-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px 18px;
+            height: 100%;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--secondary);
+        }
+
+        .benefit-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EAF8FA;
+            color: var(--secondary);
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .benefit-card h6 {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-navy);
+            margin-bottom: 4px;
+        }
+
+        .benefit-card p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ================= HOW IT WORKS ================= */
+        .how-section {
+            background: #F4F8FB;
+            border-top: 1px solid #E5EDF2;
+            border-bottom: 1px solid #E5EDF2;
+        }
+
+        .steps-container {
+            position: relative;
+            margin-top: 25px;
+        }
+
+        .steps-line {
+            position: absolute;
+            top: 36px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: #D5E4EC;
+            z-index: 1;
+        }
+
+        .step-card {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 10px 15px;
+        }
+
+        .step-number-circle {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(8, 43, 58, 0.06);
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--primary-light);
+            transition: all 0.25s ease;
+        }
+
+        .step-card:hover .step-number-circle {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            color: #ffffff;
+            border-color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .step-card h5 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-navy);
+            margin-bottom: 8px;
+        }
+
+        .step-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* ================= CTA SECTION ================= */
+        .cta-section {
+            padding: 85px 0;
+            position: relative;
+            background: linear-gradient(135deg, #051826 0%, #0B3D56 50%, #0F6880 100%);
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 26px 26px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(28px, 3.8vw, 40px);
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 14px;
+        }
+
+        .cta-section p {
+            color: #C9E2ED;
+            font-size: 14.5px;
+            max-width: 620px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+        }
+
+        .cta-btn {
+            border: 0;
+            padding: 14px 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            color: #ffffff !important;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 28px rgba(15, 168, 196, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(15, 168, 196, 0.5);
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: #051826;
+            color: #ffffff;
+            padding: 60px 0 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .footer-brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .footer-brand-sub {
+            font-size: 8px;
+            color: #7997A8;
+            letter-spacing: 1px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .footer-text {
+            color: #8AA1AC;
+            font-size: 12px;
+            line-height: 1.7;
+            max-width: 340px;
+            margin-bottom: 0;
+        }
+
+        .footer-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            color: #C0D8E5;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .footer-link {
+            display: block;
+            color: #8AA1AC;
+            font-size: 12px;
+            margin-bottom: 10px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        .footer-copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 45px;
+            padding-top: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #6E8694;
+            font-size: 11px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 991px) {
+            .steps-line { display: none; }
+            .hero-visual-card { margin-top: 40px; }
+        }
+
+        @media (max-width: 767px) {
+            .stat-box:not(:last-child)::after { display: none; }
+            .stat-box { border-bottom: 1px solid #EEF3F6; }
+            .section { padding: 65px 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <div class="brand-logo">SC</div>
+                <div class="brand-text">
+                    Smart Construction
+                    <small>PROJECT MANAGEMENT SYSTEM</small>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#modules">Modules</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <a class="login-btn" href="login.html">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Login</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section class="hero" id="home">
+        <div class="hero-glow"></div>
+
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <!-- Hero Left: Text & CTA -->
+                <div class="col-lg-6 hero-content">
+                    <div class="hero-badge">
+                        <i class="bi bi-buildings"></i>
+                        <span>SMART CONSTRUCTION MANAGEMENT</span>
+                    </div>
+
+                    <h1>
+                        Build Smarter.<br>
+                        <span class="text-highlight">Manage Better.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        A centralized construction project and workforce management system designed to simplify project planning, workforce management, attendance, payroll, materials and site progress tracking.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="login.html" class="primary-btn">
+                            <span>Get Started</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                        <a href="#features" class="secondary-btn">
+                            <span>Explore Features</span>
+                        </a>
+                    </div>
+
+                    <div class="hero-features-list">
+                        <div class="hero-feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Real-Time Site Data</span>
+                        </div>
+                        <div class="hero-feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Role-Based Access</span>
+                        </div>
+                        <div class="hero-feature-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>100% Digital Workflow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Right: High-Quality Realistic Construction Image Visual -->
+                <div class="col-lg-6">
+                    <div class="hero-visual-card">
+                        <div class="hero-image-wrapper">
+                            <img src="assets/images/hero-construction.jpg" alt="Modern Construction Site Engineering" class="hero-construction-img">
+                            <div class="hero-image-overlay"></div>
+
+                            <!-- Floating Live Status Badge -->
+                            <div class="hero-floating-badge">
+                                <span class="live-dot"></span>
+                                <span>Active Site • Metro Tower II</span>
+                            </div>
+
+                            <!-- Floating Operational Metrics -->
+                            <div class="hero-floating-metrics">
+                                <div class="metric-mini-item">
+                                    <div class="metric-mini-val">148</div>
+                                    <div class="metric-mini-lbl">Workforce</div>
+                                </div>
+                                <div class="metric-mini-item">
+                                    <div class="metric-mini-val">12</div>
+                                    <div class="metric-mini-lbl">Projects</div>
+                                </div>
+                                <div class="metric-mini-item">
+                                    <div class="metric-mini-val">78%</div>
+                                    <div class="metric-mini-lbl">Progress</div>
+                                </div>
+                                <div class="metric-mini-item">
+                                    <div class="metric-mini-val">94%</div>
+                                    <div class="metric-mini-lbl">Materials</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= STATS SECTION ================= -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row g-0">
+                <div class="col-lg-3 col-6">
+                    <div class="stat-box">
+                        <div class="stat-number">01</div>
+                        <div class="stat-label">CENTRALIZED PLATFORM</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <div class="stat-box">
+                        <div class="stat-number">10<span>+</span></div>
+                        <div class="stat-label">MANAGEMENT MODULES</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <div class="stat-box">
+                        <div class="stat-number">24<span>/7</span></div>
+                        <div class="stat-label">DATA ACCESS</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <div class="stat-box">
+                        <div class="stat-number">100<span>%</span></div>
+                        <div class="stat-label">DIGITAL MANAGEMENT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= FEATURES SECTION (8 Cards) ================= -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-label">WHY SMART CONSTRUCTION</div>
+                <h2 class="section-title">Everything You Need to Manage a Construction Site</h2>
+                <p class="section-description mx-auto">
+                    Bring project data, workforce, attendance, salary, materials and progress into one organized platform.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- 1. Project Management -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-kanban"></i>
+                        </div>
+                        <h5>Project Management</h5>
+                        <p>Create and manage construction projects, budgets, engineers, schedules and completion progress.</p>
+                    </div>
+                </div>
+
+                <!-- 2. Workforce Management -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h5>Workforce Management</h5>
+                        <p>Maintain worker records, roles, contact details, project assignments and wages in an organized system.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Attendance Tracking -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h5>Attendance Tracking</h5>
+                        <p>Record daily worker attendance, check-in, check-out, present, absent and late status.</p>
+                    </div>
+                </div>
+
+                <!-- 4. Payroll & Salary -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h5>Payroll &amp; Salary</h5>
+                        <p>Track worker wages, attendance-based salary, overtime, advances and payment records.</p>
+                    </div>
+                </div>
+
+                <!-- 5. Material Management -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h5>Material Management</h5>
+                        <p>Monitor construction materials, available stock, usage, suppliers and low-stock alerts.</p>
+                    </div>
+                </div>
+
+                <!-- 6. Progress Monitoring -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h5>Progress Monitoring</h5>
+                        <p>Record daily site activities, project progress and updates for better construction monitoring.</p>
+                    </div>
+                </div>
+
+                <!-- 7. Site Issue Management -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <h5>Site Issue Management</h5>
+                        <p>Identify, log, prioritize, and resolve site safety and operational bottlenecks in real time.</p>
+                    </div>
+                </div>
+
+                <!-- 8. Reports & Analytics -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <h5>Reports &amp; Analytics</h5>
+                        <p>Generate comprehensive project performance, attendance, payroll, and material reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= MODULES SECTION (9 Informational Cards) ================= -->
+    <!-- NOTE: Module cards are informational and DO NOT navigate away from the landing page -->
+    <section class="section modules-section" id="modules">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-label">COMPLETE SYSTEM</div>
+                <h2 class="section-title">One Platform. Multiple Operations.</h2>
+                <p class="section-description mx-auto">
+                    Everything required to manage construction projects, workforce and site operations from one centralized system.
+                </p>
+            </div>
+
+            <div class="row g-3">
+                <!-- 1. Projects -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Projects</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Manage construction projects</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Workforce -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Workforce</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Manage workers and teams</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Tasks -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-check2-square"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Tasks</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Assign and track tasks</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Attendance -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Attendance</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Daily attendance records</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Payroll & Salary -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Payroll &amp; Salary</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Worker salary management</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Materials -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Materials</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Stock and material tracking</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Site Issues -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Site Issues</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Report and resolve issues</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Daily Progress -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Daily Progress</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Monitor daily site activities</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Reports -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="module-card">
+                        <div class="module-icon-box">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        </div>
+                        <div class="module-body">
+                            <div class="module-body-top">
+                                <h6>Reports</h6>
+                                <span class="module-badge">System Module</span>
+                            </div>
+                            <p>Generate management reports</p>
+                            <span class="module-lock-info">
+                                <i class="bi bi-shield-lock"></i>
+                                Available in Dashboard
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ABOUT SECTION ================= -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <!-- Left: Text & CTA -->
+                <div class="col-lg-6 about-text">
+                    <div class="section-label">ABOUT THE PROJECT</div>
+                    <h2>Digital Management for Modern Construction</h2>
+                    <p>
+                        Smart Construction is designed to reduce manual paperwork and provide a centralized system for managing construction operations.
+                    </p>
+                    <p>
+                        The system connects project management, workforce, attendance, payroll, materials, site issues and progress tracking into one platform.
+                    </p>
+                    <a href="login.html" class="primary-btn mt-2">
+                        <span>Access Management System</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Right: 4 Benefit Cards -->
+                <div class="col-lg-6">
+                    <div class="about-box-wrapper">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="benefit-card">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-speedometer2"></i>
+                                    </div>
+                                    <h6>Faster Decisions</h6>
+                                    <p>Centralized project information.</p>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="benefit-card">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <h6>Organized Data</h6>
+                                    <p>Structured digital records.</p>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="benefit-card">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+                                    <h6>Save Time</h6>
+                                    <p>Reduce repetitive paperwork.</p>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="benefit-card">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-bar-chart"></i>
+                                    </div>
+                                    <h6>Better Monitoring</h6>
+                                    <p>Track construction progress.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= HOW IT WORKS SECTION ================= -->
+    <section class="section how-section" id="how-it-works">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-label">HOW IT WORKS</div>
+                <h2 class="section-title">How Smart Construction Works</h2>
+                <p class="section-description mx-auto">
+                    A streamlined, transparent four-step workflow to modernize site administration from setup to delivery.
+                </p>
+            </div>
+
+            <div class="steps-container">
+                <div class="steps-line d-none d-lg-block"></div>
+                <div class="row g-4">
+                    <!-- Step 1 -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="step-card">
+                            <div class="step-number-circle">01</div>
+                            <h5>Create Projects</h5>
+                            <p>Set up project details, budgets and schedules.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="step-card">
+                            <div class="step-number-circle">02</div>
+                            <h5>Manage Workforce</h5>
+                            <p>Add workers, engineers and assignments.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="step-card">
+                            <div class="step-number-circle">03</div>
+                            <h5>Track Daily Operations</h5>
+                            <p>Manage attendance, tasks, materials and issues.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="step-card">
+                            <div class="step-number-circle">04</div>
+                            <h5>Monitor Progress</h5>
+                            <p>Review progress, payroll and management reports.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CTA SECTION ================= -->
+    <section class="cta-section">
+        <div class="container text-center cta-content">
+            <h2>Ready to Manage Your Construction Better?</h2>
+            <p>
+                Access the Smart Construction Management System and start managing projects, workforce and site operations digitally.
+            </p>
+            <a href="login.html" class="cta-btn">
+                <span>Login to System</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <!-- Column 1: Brand & Info -->
+                <div class="col-lg-5 col-md-6">
+                    <div class="footer-brand-wrap">
+                        <div class="brand-logo">SC</div>
+                        <div>
+                            <span class="footer-brand-title">Smart Construction</span>
+                            <span class="footer-brand-sub">PROJECT MANAGEMENT SYSTEM</span>
+                        </div>
+                    </div>
+                    <p class="footer-text">
+                        A centralized project and workforce management system for efficient, organized and transparent construction operations.
+                    </p>
+                </div>
+
+                <!-- Column 2: System Navigation -->
+                <div class="col-6 col-lg-2 col-md-3">
+                    <div class="footer-title">SYSTEM</div>
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#modules" class="footer-link">Modules</a>
+                    <a href="#about" class="footer-link">About</a>
+                    <a href="#how-it-works" class="footer-link">How It Works</a>
+                </div>
+
+                <!-- Column 3: Management Info (Points to Modules section, does NOT open internal pages) -->
+                <div class="col-6 col-lg-2 col-md-3">
+                    <div class="footer-title">MANAGEMENT</div>
+                    <a href="#modules" class="footer-link">Projects</a>
+                    <a href="#modules" class="footer-link">Workforce</a>
+                    <a href="#modules" class="footer-link">Payroll</a>
+                </div>
+
+                <!-- Column 4: Access / Auth -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-title">ACCESS</div>
+                    <a href="login.html" class="footer-link">
+                        <i class="bi bi-shield-lock me-1"></i> Administrator Login
+                    </a>
+                    <a href="login.html" class="footer-link">
+                        <i class="bi bi-person-gear me-1"></i> Engineer Login
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright Bar -->
+            <div class="footer-copyright">
+                <div>
+                    &copy; 2026 Smart Construction Management System. Academic Project.
+                </div>
+                <div>
+                    <a href="#home" class="d-inline-flex align-items-center gap-1">
+                        <span>Back to top</span>
+                        <i class="bi bi-arrow-up"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Auto-close responsive navbar on mobile after clicking a link
+        document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navCollapse = document.getElementById('mainNav');
+                if (navCollapse && navCollapse.classList.contains('show')) {
+                    const bsCollapse = bootstrap.Collapse.getInstance(navCollapse);
+                    if (bsCollapse) {
+                        bsCollapse.hide();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

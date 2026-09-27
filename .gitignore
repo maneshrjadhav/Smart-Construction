@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+backend/.env
+serviceAccountKey.json
+backend/serviceAccountKey.json
+
+dist/
+frontend/dist/
+
+*.db
+*.sqlite
+*.sqlite3
+
+.vscode/

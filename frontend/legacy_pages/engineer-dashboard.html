@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineer Dashboard | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .assigned-project-card {
+            background: linear-gradient(135deg, #082B3A 0%, #0B3D56 60%, #0F6880 100%);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 26px 28px;
+            box-shadow: 0 10px 30px rgba(8, 43, 58, 0.18);
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assigned-project-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 22px 22px;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .assigned-project-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-detail-pill {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+
+        .project-detail-lbl {
+            font-size: 10px;
+            color: #A5C8DB;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 700;
+        }
+
+        .project-detail-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-top: 3px;
+        }
+
+        .project-big-progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 14px;
+        }
+
+        .project-big-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #27C4E8, #38BDF8);
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .badge-engineer-code {
+            background: rgba(39, 196, 232, 0.2);
+            color: #27C4E8;
+            border: 1px solid rgba(39, 196, 232, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Site Console</div>
+                        <h1 class="page-heading-title">Engineer Dashboard</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">VS</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">Vikram Sharma</strong>
+                            <span id="topbarUserRole">Site Engineer</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+                <!-- Welcome Greeting Banner -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="mb-1" style="font-size: 24px; font-weight: 800;">
+                            <span id="greetingTime">Good Morning</span>, <span id="engineerGreetingName">Vikram</span>
+                        </h2>
+                        <p class="text-muted mb-0" style="font-size: 13px;">
+                            Here is your current project and site activity overview.
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge-engineer-code" id="displayEngineerCode">ID: ENG-001</span>
+                        <a href="progress.html" class="btn-saas-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Update Daily Progress</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- MY ASSIGNED PROJECT HERO CARD -->
+                <div class="assigned-project-card">
+                    <div class="assigned-project-content">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-white text-dark fw-bold px-2 py-1" style="font-size: 10px; letter-spacing: 0.8px;">
+                                    MY ASSIGNED PROJECT
+                                </span>
+                                <span class="badge bg-success-subtle text-success fw-bold" id="projectStatusBadge">
+                                    Active
+                                </span>
+                            </div>
+                            <span class="text-info fw-bold" style="font-size: 12.5px;">
+                                Overall Completion: <span id="projectProgressPercent">78%</span>
+                            </span>
+                        </div>
+
+                        <h3 class="mb-3 text-white" id="projectName" style="font-size: 22px; font-weight: 800;">
+                            Metro Tower Phase II — Commercial Wing
+                        </h3>
+
+                        <!-- Grid of Project Specs -->
+                        <div class="row g-3 mt-1">
+                            <div class="col-6 col-md-3">
+                                <div class="project-detail-pill">
+                                    <div class="project-detail-lbl"><i class="bi bi-geo-alt me-1"></i>Location</div>
+                                    <div class="project-detail-val text-truncate" id="projectLocation">Sector 48, Gurgaon</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="project-detail-pill">
+                                    <div class="project-detail-lbl"><i class="bi bi-currency-rupee me-1"></i>Budget</div>
+                                    <div class="project-detail-val" id="projectBudget">₹4,50,00,000</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="project-detail-pill">
+                                    <div class="project-detail-lbl"><i class="bi bi-calendar-event me-1"></i>Start Date</div>
+                                    <div class="project-detail-val" id="projectStartDate">01 Mar 2026</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="project-detail-pill">
+                                    <div class="project-detail-lbl"><i class="bi bi-flag me-1"></i>Target Date</div>
+                                    <div class="project-detail-val" id="projectEndDate">30 Nov 2026</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Big Project Progress Bar -->
+                        <div class="project-big-progress">
+                            <div class="project-big-progress-bar" id="projectProgressBar" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8 Operational Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <!-- 1. My Project -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-navy"><i class="bi bi-buildings"></i></div>
+                                <span class="saas-badge saas-badge-info">Assigned</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statProjectCount">01</div>
+                                <div class="stat-title">My Project</div>
+                                <div class="stat-footer-text text-truncate" id="statProjectNameSub">Metro Tower II</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Project Progress -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-teal"><i class="bi bi-speedometer2"></i></div>
+                                <span class="saas-badge saas-badge-success">On Schedule</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statProgressVal">78%</div>
+                                <div class="stat-title">Project Progress</div>
+                                <div class="stat-footer-text">Civil Structure 85% done</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Today's Tasks -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-green"><i class="bi bi-check2-square"></i></div>
+                                <span class="saas-badge saas-badge-warning" id="statPendingTasksBadge">3 Pending</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statTotalTasks">08</div>
+                                <div class="stat-title">Today's Tasks</div>
+                                <div class="stat-footer-text">5 Tasks completed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Workforce -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-teal"><i class="bi bi-people"></i></div>
+                                <span class="saas-badge saas-badge-info">On-Site</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statWorkforceCount">42</div>
+                                <div class="stat-title">Workforce Deployed</div>
+                                <div class="stat-footer-text">Assigned to this project</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Today's Attendance -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-green"><i class="bi bi-calendar-check"></i></div>
+                                <span class="saas-badge saas-badge-success">95% Turnout</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statAttendancePresent">38</div>
+                                <div class="stat-title">Today's Attendance</div>
+                                <div class="stat-footer-text">4 absent / leave</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Open Site Issues -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-danger"><i class="bi bi-exclamation-triangle"></i></div>
+                                <span class="saas-badge saas-badge-danger" id="statUrgentIssuesBadge">1 High Priority</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statOpenIssues">02</div>
+                                <div class="stat-title">Open Site Issues</div>
+                                <div class="stat-footer-text">Requires site inspection</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. Material Alerts -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-amber"><i class="bi bi-box-seam"></i></div>
+                                <span class="saas-badge saas-badge-warning" id="statLowStockBadge">Low Stock</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statMaterialAlerts">01</div>
+                                <div class="stat-title">Material Alerts</div>
+                                <div class="stat-footer-text">Cement bags re-order</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Daily Progress -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="saas-stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-box stat-icon-purple"><i class="bi bi-journal-check"></i></div>
+                                <span class="saas-badge saas-badge-purple">Logged Today</span>
+                            </div>
+                            <div>
+                                <div class="stat-val" id="statProgressLogs">14</div>
+                                <div class="stat-title">Daily Progress Logs</div>
+                                <div class="stat-footer-text" id="statLatestLogDate">Latest: Today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split Workspace: Tasks & Site Issues Table Previews -->
+                <div class="row g-4">
+                    <!-- Left: Today's Assigned Tasks -->
+                    <div class="col-lg-7">
+                        <div class="saas-card h-100">
+                            <div class="saas-card-header">
+                                <div>
+                                    <h3 class="saas-card-title">Priority Site Tasks</h3>
+                                    <div class="saas-card-sub">Field execution assignments for current phase</div>
+                                </div>
+                                <a href="tasks.html" class="btn-saas-secondary py-1 px-2" style="font-size: 11.5px;">
+                                    View All Tasks <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <div class="saas-table-container">
+                                <table class="saas-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Task Name</th>
+                                            <th>Assigned To</th>
+                                            <th>Due Date</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="engineerTasksTable">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading tasks...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Site Issues Requiring Resolution -->
+                    <div class="col-lg-5">
+                        <div class="saas-card h-100">
+                            <div class="saas-card-header">
+                                <div>
+                                    <h3 class="saas-card-title">Active Site Issues</h3>
+                                    <div class="saas-card-sub">Reported safety &amp; material bottlenecks</div>
+                                </div>
+                                <a href="issues.html" class="btn-saas-secondary py-1 px-2" style="font-size: 11.5px;">
+                                    Manage <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <div class="saas-table-container">
+                                <table class="saas-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Issue</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="engineerIssuesTable">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">
+                                                <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading issues...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        // Restrict page to authenticated Engineer
+        const user = requireAuth(['Engineer']);
+
+        // Initialize sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('dashboard', true);
+        initAppNavigation('dashboard');
+
+        // Greeting
+        if (user) {
+            const hour = new Date().getHours();
+            let timeGreeting = 'Good Morning';
+            if (hour >= 12 && hour < 17) timeGreeting = 'Good Afternoon';
+            else if (hour >= 17) timeGreeting = 'Good Evening';
+
+            document.getElementById('greetingTime').textContent = timeGreeting;
+            document.getElementById('engineerGreetingName').textContent = user.name.split(' ')[0] || user.name;
+            if (user.engineerId) {
+                document.getElementById('displayEngineerCode').textContent = `ID: ${user.engineerId}`;
+            }
+        }
+
+        // Load Real Database Information
+        async function loadEngineerDashboardData() {
+            try {
+                // 1. Projects
+                const projRes = await fetch('/api/projects');
+                const projData = await projRes.json();
+                if (projData.success && projData.projects && projData.projects.length > 0) {
+                    const p = projData.projects[0];
+                    document.getElementById('projectName').textContent = p.name || 'Site Project';
+                    document.getElementById('projectLocation').textContent = formatValue(p.location);
+                    document.getElementById('projectBudget').textContent = formatCurrency(p.budget);
+                    document.getElementById('projectStartDate').textContent = formatDate(p.startDate);
+                    document.getElementById('projectEndDate').textContent = formatDate(p.completionDate);
+                    const prog = p.progress || 78;
+                    document.getElementById('projectProgressPercent').textContent = prog + '%';
+                    document.getElementById('projectProgressBar').style.width = prog + '%';
+                    document.getElementById('statProgressVal').textContent = prog + '%';
+                    document.getElementById('statProjectNameSub').textContent = p.name || 'Metro Tower';
+                    document.getElementById('projectStatusBadge').textContent = p.status || 'Active';
+                }
+
+                // 2. Tasks
+                const tasksRes = await fetch('/api/tasks');
+                const tasksData = await tasksRes.json();
+                const tasksTbody = document.getElementById('engineerTasksTable');
+                if (tasksData.success && Array.isArray(tasksData.tasks) && tasksData.tasks.length > 0) {
+                    document.getElementById('statTotalTasks').textContent = String(tasksData.tasks.length).padStart(2, '0');
+                    const pendingCount = tasksData.tasks.filter(t => (t.status || '').toLowerCase() !== 'completed').length;
+                    document.getElementById('statPendingTasksBadge').textContent = `${pendingCount} Pending`;
+
+                    tasksTbody.innerHTML = tasksData.tasks.slice(0, 5).map(t => {
+                        let priorityClass = 'saas-badge-warning';
+                        if ((t.priority || '').toLowerCase() === 'high') priorityClass = 'saas-badge-danger';
+                        if ((t.priority || '').toLowerCase() === 'low') priorityClass = 'saas-badge-info';
+
+                        let statusClass = 'saas-badge-warning';
+                        if ((t.status || '').toLowerCase() === 'completed') statusClass = 'saas-badge-success';
+                        if ((t.status || '').toLowerCase() === 'in progress') statusClass = 'saas-badge-info';
+
+                        return `
+                            <tr>
+                                <td class="fw-bold">${formatValue(t.task_name)}</td>
+                                <td>${formatValue(t.assigned_to)}</td>
+                                <td>${formatDate(t.due_date)}</td>
+                                <td><span class="saas-badge ${priorityClass}">${formatValue(t.priority)}</span></td>
+                                <td><span class="saas-badge ${statusClass}">${formatValue(t.status)}</span></td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tasksTbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="bi bi-check2-all text-success fs-4 d-block mb-1"></i> No pending tasks for today.
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // 3. Workers
+                const workersRes = await fetch('/api/workers');
+                const workersData = await workersRes.json();
+                if (workersData.success && Array.isArray(workersData.workers)) {
+                    document.getElementById('statWorkforceCount').textContent = String(workersData.workers.length).padStart(2, '0');
+                }
+
+                // 4. Issues
+                const issuesRes = await fetch('/api/issues');
+                const issuesData = await issuesRes.json();
+                const issuesTbody = document.getElementById('engineerIssuesTable');
+                if (issuesData.success && Array.isArray(issuesData.issues) && issuesData.issues.length > 0) {
+                    const openIssues = issuesData.issues.filter(i => (i.status || '').toLowerCase() !== 'resolved');
+                    document.getElementById('statOpenIssues').textContent = String(openIssues.length).padStart(2, '0');
+
+                    issuesTbody.innerHTML = issuesData.issues.slice(0, 5).map(issue => {
+                        let pClass = 'saas-badge-warning';
+                        if ((issue.priority || '').toLowerCase() === 'high' || (issue.priority || '').toLowerCase() === 'critical') pClass = 'saas-badge-danger';
+
+                        let sClass = 'saas-badge-warning';
+                        if ((issue.status || '').toLowerCase() === 'resolved') sClass = 'saas-badge-success';
+
+                        return `
+                            <tr>
+                                <td class="fw-bold text-truncate" style="max-width: 140px;">${formatValue(issue.title)}</td>
+                                <td><span class="saas-badge ${pClass}">${formatValue(issue.priority)}</span></td>
+                                <td><span class="saas-badge ${sClass}">${formatValue(issue.status)}</span></td>
+                                <td>${formatDate(issue.date || issue.created_at)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    issuesTbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-shield-check text-success fs-4 d-block mb-1"></i> No open site issues reported.
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // 5. Materials
+                const matRes = await fetch('/api/materials');
+                const matData = await matRes.json();
+                if (matData.success && Array.isArray(matData.materials)) {
+                    const lowStock = matData.materials.filter(m => Number(m.quantity) < 20).length;
+                    document.getElementById('statMaterialAlerts').textContent = String(lowStock).padStart(2, '0');
+                }
+
+                // 6. Progress
+                const progRes = await fetch('/api/progress');
+                const progData = await progRes.json();
+                if (progData.success && Array.isArray(progData.progress)) {
+                    document.getElementById('statProgressLogs').textContent = String(progData.progress.length).padStart(2, '0');
+                    if (progData.progress.length > 0) {
+                        document.getElementById('statLatestLogDate').textContent = 'Latest: ' + formatDate(progData.progress[0].date);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Failed to load engineer dashboard data:', err);
+                showToast('Notice', 'Unable to sync live site data. Using cached metrics.', 'warning');
+            }
+        }
+
+        loadEngineerDashboardData();
+    </script>
+</body>
+
+</html>
+

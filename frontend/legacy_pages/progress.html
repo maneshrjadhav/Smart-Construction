@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Progress Tracking | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .filter-pill {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: var(--secondary);
+            color: #ffffff;
+            border-color: var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Monitoring / Progress</div>
+                        <h1 class="page-heading-title">Daily Construction Progress Logs</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Site Milestone &amp; Daily Activity Log</h2>
+                        <div class="text-muted" style="font-size: 13px;">Record daily work accomplished, manpower deployed, and cumulative completion %</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-saas-primary" onclick="openAddProgressModal()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Post Daily Report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e8f5f8; color:#0fa8c4;">
+                                <i class="bi bi-bar-chart-line-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">TOTAL LOGS FILED</div>
+                                <div class="metric-number" id="totalLogsCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">MANPOWER DEPLOYED</div>
+                                <div class="metric-number text-success" id="totalManpowerCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#f0edff; color:#6366f1;">
+                                <i class="bi bi-pie-chart-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">AVG LOG PROGRESS</div>
+                                <div class="metric-number" id="avgProgressVal">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fef3c7; color:#f59e0b;">
+                                <i class="bi bi-buildings"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">ACTIVE SITES</div>
+                                <div class="metric-number" id="activeSitesCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="saas-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="position-relative flex-grow-1" style="max-width: 380px;">
+                            <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search by project or work description..." style="font-size: 13px; height: 40px; border-radius: 8px;">
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" class="filter-pill active" onclick="setFilter('all', this)">All Logs</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('In Progress', this)">In Progress</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Completed', this)">Completed</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('On Track', this)">On Track</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Table Card -->
+                <div class="saas-card">
+                    <div class="table-responsive">
+                        <table class="saas-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>PROJECT</th>
+                                    <th>WORK COMPLETED</th>
+                                    <th>PROGRESS</th>
+                                    <th>WORKERS</th>
+                                    <th>STATUS</th>
+                                    <th class="text-end">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="progressTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Loading daily progress records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= ADD / EDIT PROGRESS MODAL ================= -->
+    <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <form id="progressForm">
+                    <div class="modal-header text-white" style="background: var(--primary);">
+                        <h5 class="modal-title fw-bold" id="progressModalTitle">Post Daily Progress Log</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="editProgressId">
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Log Date *</label>
+                                <input type="date" class="form-control" id="logDateInput" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Project Site *</label>
+                                <select class="form-select" id="logProjectSelect" required>
+                                    <option value="">Select Project</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Summary of Work Accomplished *</label>
+                            <input type="text" class="form-control" id="workCompletedInput" placeholder="e.g. Casting of 3rd floor slab & beam rebar inspection" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Workers / Laborers Deployed</label>
+                                <input type="number" class="form-control" id="workersDeployedInput" min="0" placeholder="e.g. 28">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Milestone Status</label>
+                                <select class="form-select" id="logStatusSelect">
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="On Track">On Track</option>
+                                    <option value="Delayed">Delayed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold d-flex justify-content-between" style="font-size: 12.5px;">
+                                <span>Completion Percentage</span>
+                                <strong id="progressPercentLabel" style="color: var(--secondary);">0%</strong>
+                            </label>
+                            <input type="range" class="form-range" id="progressPercentInput" min="0" max="100" value="0" oninput="document.getElementById('progressPercentLabel').textContent = this.value + '%'">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Field Remarks / Inspection Notes</label>
+                            <textarea class="form-control" id="remarksInput" rows="2" placeholder="Quality checks passed, weather conditions, equipment uptime..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary">
+                            <i class="bi bi-check-lg"></i>
+                            <span id="saveProgressBtnLabel">Save Progress Log</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW DETAILS MODAL ================= -->
+    <div class="modal fade" id="viewProgressModal" tabindex="-1" aria-labelledby="viewProgressModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <div class="modal-header text-white" style="background: var(--primary);">
+                    <h5 class="modal-title fw-bold" id="viewProgressModalTitle">Daily Log Dossier</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="viewProgressContent">
+                    <!-- Dynamic details -->
+                </div>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('progress', !isAdministrator);
+        initAppNavigation('progress');
+
+        // State
+        let allProgress = [];
+        let allProjects = [];
+        let currentFilter = 'all';
+
+        const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+        const viewProgressModal = new bootstrap.Modal(document.getElementById('viewProgressModal'));
+
+        // Load data
+        async function loadProgress() {
+            try {
+                const res = await fetch('/api/progress');
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to fetch progress');
+                allProgress = data.progress || [];
+                renderProgress();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Unable to retrieve progress logs.', 'error');
+            }
+        }
+
+        async function loadProjectsDropdown() {
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                allProjects = data.projects || [];
+                const select = document.getElementById('logProjectSelect');
+                select.innerHTML = '<option value="">Select Project</option>';
+                allProjects.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name;
+                    opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.warn('Projects dropdown load error', err);
+            }
+        }
+
+        function getFilteredProgress() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            return allProgress.filter(p => {
+                const proj = (p.project || '').toLowerCase();
+                const work = (p.work_completed || '').toLowerCase();
+                const remarks = (p.remarks || '').toLowerCase();
+                const matchesQuery = !q || proj.includes(q) || work.includes(q) || remarks.includes(q);
+
+                let matchesFilter = true;
+                if (currentFilter !== 'all') {
+                    matchesFilter = (p.status || '').toLowerCase() === currentFilter.toLowerCase();
+                }
+
+                return matchesQuery && matchesFilter;
+            });
+        }
+
+        function renderProgress() {
+            const list = getFilteredProgress();
+            const tbody = document.getElementById('progressTableBody');
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-clipboard2-data fs-2 d-block mb-2"></i> No daily progress logs match your criteria.
+                        </td>
+                    </tr>
+                `;
+                updateMetrics();
+                return;
+            }
+
+            tbody.innerHTML = list.map(p => {
+                const prog = Math.max(0, Math.min(100, Number(p.progress_percent || 0)));
+                const st = p.status || 'In Progress';
+
+                let stBadgeClass = 'saas-badge-info';
+                if (st.toLowerCase() === 'completed') stBadgeClass = 'saas-badge-success';
+                if (st.toLowerCase() === 'delayed') stBadgeClass = 'saas-badge-danger';
+                if (st.toLowerCase() === 'on track') stBadgeClass = 'saas-badge-warning';
+
+                return `
+                    <tr>
+                        <td>
+                            <strong class="text-dark">${formatDate(p.date)}</strong>
+                        </td>
+                        <td>
+                            <span class="saas-badge saas-badge-info"><i class="bi bi-buildings me-1"></i>${formatValue(p.project)}</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold" style="color:var(--primary); cursor:pointer;" onclick="viewProgressDetails(${p.id})">${formatValue(p.work_completed)}</div>
+                            ${p.remarks ? `<div class="text-muted small text-truncate" style="max-width:280px;">${formatValue(p.remarks)}</div>` : ''}
+                        </td>
+                        <td style="min-width: 140px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="saas-progress-track flex-grow-1" style="height: 6px;">
+                                    <div class="saas-progress-bar" style="width: ${prog}%;"></div>
+                                </div>
+                                <small class="fw-bold">${prog}%</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" style="background:#F1F5F9; color:#334155; font-weight:700;"><i class="bi bi-person me-1"></i>${formatValue(p.workers_deployed, 0)}</span>
+                        </td>
+                        <td>
+                            <span class="saas-badge ${stBadgeClass}">${st}</span>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="viewProgressDetails(${p.id})" title="View Log">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="editProgress(${p.id})" title="Edit Log">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2 text-danger" onclick="deleteProgress(${p.id})" title="Delete Log">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const total = allProgress.length;
+            let manpower = 0;
+            let sumProg = 0;
+            const sites = new Set();
+
+            allProgress.forEach(p => {
+                manpower += Number(p.workers_deployed || 0);
+                sumProg += Number(p.progress_percent || 0);
+                if (p.project) sites.add(p.project);
+            });
+
+            const avg = total ? Math.round(sumProg / total) : 0;
+
+            document.getElementById('totalLogsCount').textContent = total;
+            document.getElementById('totalManpowerCount').textContent = manpower.toLocaleString('en-IN');
+            document.getElementById('avgProgressVal').textContent = avg + '%';
+            document.getElementById('activeSitesCount').textContent = sites.size;
+        }
+
+        function setFilter(f, btn) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            renderProgress();
+        }
+
+        function openAddProgressModal() {
+            document.getElementById('progressModalTitle').textContent = 'Post Daily Progress Log';
+            document.getElementById('saveProgressBtnLabel').textContent = 'Save Progress Log';
+            document.getElementById('progressForm').reset();
+            document.getElementById('editProgressId').value = '';
+            document.getElementById('logDateInput').valueAsDate = new Date();
+            document.getElementById('progressPercentInput').value = 0;
+            document.getElementById('progressPercentLabel').textContent = '0%';
+            progressModal.show();
+        }
+
+        function editProgress(id) {
+            const item = allProgress.find(x => Number(x.id) === Number(id));
+            if (!item) return;
+
+            document.getElementById('progressModalTitle').textContent = 'Edit Progress Report';
+            document.getElementById('saveProgressBtnLabel').textContent = 'Update Log';
+            document.getElementById('editProgressId').value = item.id;
+
+            if (item.date) {
+                const d = new Date(item.date);
+                if (!isNaN(d.getTime())) document.getElementById('logDateInput').value = d.toISOString().split('T')[0];
+            } else {
+                document.getElementById('logDateInput').value = '';
+            }
+
+            document.getElementById('logProjectSelect').value = item.project || '';
+            document.getElementById('workCompletedInput').value = item.work_completed || '';
+            document.getElementById('workersDeployedInput').value = item.workers_deployed || 0;
+            document.getElementById('logStatusSelect').value = item.status || 'In Progress';
+            const prog = Number(item.progress_percent || 0);
+            document.getElementById('progressPercentInput').value = prog;
+            document.getElementById('progressPercentLabel').textContent = prog + '%';
+            document.getElementById('remarksInput').value = item.remarks || '';
+
+            progressModal.show();
+        }
+
+        function viewProgressDetails(id) {
+            const item = allProgress.find(x => Number(x.id) === Number(id));
+            if (!item) return;
+
+            const prog = Math.max(0, Math.min(100, Number(item.progress_percent || 0)));
+
+            document.getElementById('viewProgressContent').innerHTML = `
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="saas-badge saas-badge-info"><i class="bi bi-buildings me-1"></i>${formatValue(item.project)}</span>
+                        <span class="fw-bold text-muted">${formatDate(item.date)}</span>
+                    </div>
+                    <h5 class="fw-bold mt-2" style="color:var(--primary);">${formatValue(item.work_completed)}</h5>
+                </div>
+                <div class="row g-2 mb-3 small">
+                    <div class="col-6 text-muted">Workers Deployed: <strong class="text-dark d-block">${formatValue(item.workers_deployed, 0)} Personnel</strong></div>
+                    <div class="col-6 text-muted">Milestone Status: <strong class="text-dark d-block">${formatValue(item.status, 'In Progress')}</strong></div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                        <span class="text-muted">Reported Completion</span>
+                        <span style="color:var(--secondary);">${prog}%</span>
+                    </div>
+                    <div class="saas-progress-track" style="height: 8px;">
+                        <div class="saas-progress-bar" style="width: ${prog}%;"></div>
+                    </div>
+                </div>
+                ${item.remarks ? `
+                    <div class="p-3 bg-light rounded" style="font-size: 13px;">
+                        <div class="fw-bold text-muted small mb-1">Field Remarks:</div>
+                        ${formatValue(item.remarks)}
+                    </div>
+                ` : ''}
+            `;
+            viewProgressModal.show();
+        }
+
+        document.getElementById('progressForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editProgressId').value;
+            const payload = {
+                date: document.getElementById('logDateInput').value,
+                project: document.getElementById('logProjectSelect').value.trim(),
+                work_completed: document.getElementById('workCompletedInput').value.trim(),
+                workers_deployed: Number(document.getElementById('workersDeployedInput').value || 0),
+                progress_percent: Number(document.getElementById('progressPercentInput').value || 0),
+                status: document.getElementById('logStatusSelect').value,
+                remarks: document.getElementById('remarksInput').value.trim()
+            };
+
+            try {
+                const url = editId ? `/api/progress/${editId}` : '/api/progress';
+                const method = editId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save progress');
+
+                progressModal.hide();
+                showToast('Success', editId ? 'Progress report updated.' : 'Daily progress recorded.', 'success');
+                await loadProgress();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to save progress.', 'error');
+            }
+        });
+
+        async function deleteProgress(id) {
+            if (!confirm('Are you sure you want to delete this progress report?')) return;
+
+            try {
+                const res = await fetch(`/api/progress/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete progress');
+
+                showToast('Deleted', 'Progress report deleted.', 'info');
+                await loadProgress();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to delete progress.', 'error');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderProgress);
+
+        // Init
+        loadProgress();
+        loadProjectsDropdown();
+    </script>
+</body>
+
+</html>

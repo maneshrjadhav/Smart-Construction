@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Inventory &amp; Stock | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .filter-pill {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: var(--secondary);
+            color: #ffffff;
+            border-color: var(--secondary);
+        }
+
+        .calc-preview-box {
+            background: #F8FAFC;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Operations / Materials</div>
+                        <h1 class="page-heading-title">Site Material Inventory &amp; Stock</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Construction Material Store</h2>
+                        <div class="text-muted" style="font-size: 13px;">Manage raw material supply, stock valuation, and low inventory replenishment</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-saas-primary" onclick="openAddMaterialModal()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Add Material Item</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e8f5f8; color:#0fa8c4;">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">INVENTORY VALUATION</div>
+                                <div class="metric-number text-success" id="totalValuation">₹0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fee2e2; color:#ef4444;">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">LOW STOCK WARNINGS</div>
+                                <div class="metric-number text-danger" id="lowStockCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">TOTAL STOCK UNITS</div>
+                                <div class="metric-number" id="totalUnitsCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fef3c7; color:#f59e0b;">
+                                <i class="bi bi-tags-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">MATERIAL TYPES</div>
+                                <div class="metric-number" id="itemTypesCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="saas-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="position-relative flex-grow-1" style="max-width: 380px;">
+                            <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search materials or categories..." style="font-size: 13px; height: 40px; border-radius: 8px;">
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" class="filter-pill active" onclick="setFilter('all', this)">All Items</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Cement & Concrete', this)">Cement &amp; Concrete</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Steel & Metal', this)">Steel &amp; Metal</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Aggregates', this)">Aggregates</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('low', this)">Low Stock (&lt;10)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Materials Table Card -->
+                <div class="saas-card">
+                    <div class="table-responsive">
+                        <table class="saas-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>MATERIAL ITEM</th>
+                                    <th>CATEGORY</th>
+                                    <th>IN STOCK QTY</th>
+                                    <th>UNIT</th>
+                                    <th>UNIT RATE</th>
+                                    <th>ESTIMATED VALUE</th>
+                                    <th>STOCK STATUS</th>
+                                    <th class="text-end">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materialsTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-5 text-muted">
+                                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Loading material inventory...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= ADD / EDIT MATERIAL MODAL ================= -->
+    <div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <form id="materialForm">
+                    <div class="modal-header text-white" style="background: var(--primary);">
+                        <h5 class="modal-title fw-bold" id="materialModalTitle">Add Material Item</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="editMaterialId">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Material Name *</label>
+                            <input type="text" class="form-control" id="matNameInput" placeholder="e.g. Portland Pozzolana Cement (50kg)" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Category</label>
+                                <select class="form-select" id="matCategorySelect">
+                                    <option value="Cement & Concrete">Cement &amp; Concrete</option>
+                                    <option value="Steel & Metal">Steel &amp; Metal</option>
+                                    <option value="Aggregates">Aggregates</option>
+                                    <option value="Plumbing & Electrical">Plumbing &amp; Electrical</option>
+                                    <option value="Finishing & Paint">Finishing &amp; Paint</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Measurement Unit</label>
+                                <select class="form-select" id="matUnitSelect">
+                                    <option value="Bags">Bags</option>
+                                    <option value="Tons">Tons</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Cubic Meters">Cubic Meters</option>
+                                    <option value="Pieces">Pieces</option>
+                                    <option value="Liters">Liters</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Stock Quantity *</label>
+                                <input type="number" class="form-control" id="matQuantityInput" min="0" step="any" placeholder="e.g. 250" required oninput="recalcValuation()">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Unit Price (₹) *</label>
+                                <input type="number" class="form-control" id="matPriceInput" min="0" step="any" placeholder="e.g. 380" required oninput="recalcValuation()">
+                            </div>
+                        </div>
+
+                        <div class="calc-preview-box">
+                            <div>
+                                <small class="text-muted d-block fw-semibold">Valuation Preview</small>
+                                <span class="small text-muted" id="valuationFormula">0 × ₹0</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fs-5 fw-bold text-success" id="calcTotalValuation">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary">
+                            <i class="bi bi-check-lg"></i>
+                            <span id="saveMaterialBtnLabel">Save Material</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('materials', !isAdministrator);
+        initAppNavigation('materials');
+
+        // State
+        let allMaterials = [];
+        let currentFilter = 'all';
+
+        const materialModal = new bootstrap.Modal(document.getElementById('materialModal'));
+
+        // Load data
+        async function loadMaterials() {
+            try {
+                const res = await fetch('/api/materials');
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to fetch materials');
+                allMaterials = data.materials || [];
+                renderMaterials();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Unable to retrieve materials inventory.', 'error');
+            }
+        }
+
+        function recalcValuation() {
+            const qty = Number(document.getElementById('matQuantityInput').value || 0);
+            const price = Number(document.getElementById('matPriceInput').value || 0);
+            const total = qty * price;
+
+            document.getElementById('valuationFormula').textContent = `${qty} units × ${formatCurrency(price)}`;
+            document.getElementById('calcTotalValuation').textContent = formatCurrency(total);
+        }
+
+        function getFilteredMaterials() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            return allMaterials.filter(m => {
+                const name = (m.name || '').toLowerCase();
+                const cat = (m.category || '').toLowerCase();
+                const matchesQuery = !q || name.includes(q) || cat.includes(q);
+
+                let matchesFilter = true;
+                if (currentFilter === 'low') {
+                    matchesFilter = Number(m.quantity || 0) < 10;
+                } else if (currentFilter !== 'all') {
+                    matchesFilter = (m.category || '').toLowerCase() === currentFilter.toLowerCase();
+                }
+
+                return matchesQuery && matchesFilter;
+            });
+        }
+
+        function renderMaterials() {
+            const list = getFilteredMaterials();
+            const tbody = document.getElementById('materialsTableBody');
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-box-seam fs-2 d-block mb-2"></i> No materials found matching your query.
+                        </td>
+                    </tr>
+                `;
+                updateMetrics();
+                return;
+            }
+
+            tbody.innerHTML = list.map(m => {
+                const qty = Number(m.quantity || 0);
+                const isLow = qty < 10;
+                const statusBadge = isLow
+                    ? '<span class="saas-badge saas-badge-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Low Stock</span>'
+                    : '<span class="saas-badge saas-badge-success"><i class="bi bi-check2 me-1"></i>Adequate</span>';
+
+                return `
+                    <tr>
+                        <td>
+                            <strong style="color:var(--primary);">${formatValue(m.name)}</strong>
+                        </td>
+                        <td>
+                            <span class="saas-badge saas-badge-info">${formatValue(m.category)}</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold ${isLow ? 'text-danger' : ''}">${qty.toLocaleString('en-IN')}</span>
+                        </td>
+                        <td>${formatValue(m.unit)}</td>
+                        <td>${formatCurrency(m.unit_price)}</td>
+                        <td>
+                            <strong class="text-success">${formatCurrency(m.total_value)}</strong>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="editMaterial(${m.id})" title="Edit Item">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2 text-danger" onclick="deleteMaterial(${m.id})" title="Delete Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            let totalVal = 0;
+            let lowCount = 0;
+            let totalUnits = 0;
+
+            allMaterials.forEach(m => {
+                totalVal += Number(m.total_value || 0);
+                const q = Number(m.quantity || 0);
+                totalUnits += q;
+                if (q < 10) lowCount++;
+            });
+
+            document.getElementById('totalValuation').textContent = formatCurrency(totalVal);
+            document.getElementById('lowStockCount').textContent = lowCount;
+            document.getElementById('totalUnitsCount').textContent = totalUnits.toLocaleString('en-IN');
+            document.getElementById('itemTypesCount').textContent = allMaterials.length;
+        }
+
+        function setFilter(f, btn) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            renderMaterials();
+        }
+
+        function openAddMaterialModal() {
+            document.getElementById('materialModalTitle').textContent = 'Add Material Item';
+            document.getElementById('saveMaterialBtnLabel').textContent = 'Save Material';
+            document.getElementById('materialForm').reset();
+            document.getElementById('editMaterialId').value = '';
+            document.getElementById('matUnitSelect').value = 'Bags';
+            recalcValuation();
+            materialModal.show();
+        }
+
+        function editMaterial(id) {
+            const m = allMaterials.find(x => Number(x.id) === Number(id));
+            if (!m) return;
+
+            document.getElementById('materialModalTitle').textContent = 'Edit Material Details';
+            document.getElementById('saveMaterialBtnLabel').textContent = 'Update Material';
+            document.getElementById('editMaterialId').value = m.id;
+            document.getElementById('matNameInput').value = m.name || '';
+            document.getElementById('matCategorySelect').value = m.category || 'Cement & Concrete';
+            document.getElementById('matUnitSelect').value = m.unit || 'Bags';
+            document.getElementById('matQuantityInput').value = m.quantity || 0;
+            document.getElementById('matPriceInput').value = m.unit_price || 0;
+            recalcValuation();
+
+            materialModal.show();
+        }
+
+        document.getElementById('materialForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editMaterialId').value;
+            const payload = {
+                name: document.getElementById('matNameInput').value.trim(),
+                category: document.getElementById('matCategorySelect').value,
+                quantity: Number(document.getElementById('matQuantityInput').value || 0),
+                unit: document.getElementById('matUnitSelect').value,
+                unit_price: Number(document.getElementById('matPriceInput').value || 0)
+            };
+
+            try {
+                const url = editId ? `/api/materials/${editId}` : '/api/materials';
+                const method = editId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save material');
+
+                materialModal.hide();
+                showToast('Success', editId ? 'Material updated successfully.' : 'New material added to inventory.', 'success');
+                await loadMaterials();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to save material.', 'error');
+            }
+        });
+
+        async function deleteMaterial(id) {
+            if (!confirm('Are you sure you want to delete this material item?')) return;
+
+            try {
+                const res = await fetch(`/api/materials/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete material');
+
+                showToast('Deleted', 'Material item removed.', 'info');
+                await loadMaterials();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to delete material.', 'error');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderMaterials);
+
+        // Init
+        loadMaterials();
+    </script>
+</body>
+
+</html>

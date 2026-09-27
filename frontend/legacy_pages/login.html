@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in | Smart Construction</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #051826 0%, #082B3A 40%, #0B3D56 75%, #0F6880 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 24px;
+            left: 28px;
+            color: #C5DBE6;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #FFFFFF;
+            transform: translateX(-2px);
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1020px;
+            background: #FFFFFF;
+            border-radius: 22px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.05fr 1.25fr;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Left Visual Section */
+        .login-left {
+            position: relative;
+            background: linear-gradient(145deg, #051826 0%, #082B3A 50%, #0c435e 100%);
+            color: #FFFFFF;
+            padding: 50px 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .login-left::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.75;
+            pointer-events: none;
+        }
+
+        .login-brand-top {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .login-left-body {
+            position: relative;
+            z-index: 2;
+            margin: 40px 0;
+        }
+
+        .login-left-body h2 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+
+        .login-left-body h2 span {
+            background: linear-gradient(135deg, #27C4E8, #38BDF8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-left-body p {
+            color: #C5DBE6;
+            font-size: 13.5px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .login-feature-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .login-bullet-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #E0F2FE;
+            font-weight: 600;
+        }
+
+        .login-bullet-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: rgba(39, 196, 232, 0.15);
+            color: #27C4E8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .login-left-footer {
+            position: relative;
+            z-index: 2;
+            font-size: 11px;
+            color: #7A97A8;
+        }
+
+        /* Right Form Section */
+        .login-right {
+            padding: 50px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #FFFFFF;
+        }
+
+        .login-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #102A3A;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #64748B;
+            margin-bottom: 24px;
+        }
+
+        /* Role Selection Cards */
+        .role-selector-container {
+            margin-bottom: 22px;
+        }
+
+        .role-selector-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748B;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .role-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .role-card-option {
+            border: 2px solid #E2EBF0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .role-card-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .role-card-option.active {
+            border-color: #0FA8C4;
+            background: #F0FBFE;
+        }
+
+        .role-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: #EDF3F7;
+            color: #082B3A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .role-card-option.active .role-card-icon {
+            background: #0FA8C4;
+            color: #FFFFFF;
+        }
+
+        .role-card-text strong {
+            font-size: 13px;
+            font-weight: 800;
+            color: #102A3A;
+            display: block;
+        }
+
+        .role-card-text small {
+            font-size: 10.5px;
+            color: #64748B;
+            display: block;
+        }
+
+        /* Form Inputs */
+        .form-floating-custom {
+            margin-bottom: 16px;
+        }
+
+        .form-floating-custom label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #102A3A;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-group-custom {
+            display: flex;
+            align-items: center;
+            border: 1px solid #CBD5E1;
+            border-radius: 9px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #FFFFFF;
+        }
+
+        .input-group-custom:focus-within {
+            border-color: #0FA8C4;
+            box-shadow: 0 0 0 3px rgba(15, 168, 196, 0.15);
+        }
+
+        .input-icon-prefix {
+            padding: 10px 14px;
+            color: #64748B;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field-custom {
+            flex: 1;
+            border: 0;
+            padding: 11px 12px 11px 0;
+            font-size: 13.5px;
+            color: #102A3A;
+            outline: none;
+            background: transparent;
+        }
+
+        .input-field-custom::placeholder {
+            color: #94A3B8;
+        }
+
+        .engineer-id-help {
+            font-size: 11px;
+            color: #0FA8C4;
+            font-weight: 600;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Captcha Card */
+        .captcha-box {
+            background: #F8FAFC;
+            border: 1px solid #E2EBF0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+
+        .captcha-badge {
+            background: #082B3A;
+            color: #27C4E8;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 7px;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+
+        .captcha-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .captcha-input {
+            width: 100%;
+            border: 1px solid #CBD5E1;
+            border-radius: 7px;
+            padding: 6px 10px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .captcha-refresh-btn {
+            background: #EDF3F7;
+            border: 0;
+            border-radius: 7px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #082B3A;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .captcha-refresh-btn:hover {
+            background: #E2EBF0;
+        }
+
+        .btn-submit-login {
+            width: 100%;
+            padding: 13px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #082B3A 0%, #0FA8C4 100%);
+            color: #FFFFFF;
+            border: 0;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(15, 168, 196, 0.28);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-submit-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 168, 196, 0.4);
+        }
+
+        .login-alert {
+            display: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .login-left {
+                padding: 35px 28px;
+            }
+            .login-right {
+                padding: 35px 28px;
+            }
+            .home-link {
+                position: static;
+                margin-bottom: 16px;
+                align-self: flex-start;
+            }
+            body {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="home-link">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+    </a>
+
+    <div class="login-wrapper">
+        <!-- ================= LEFT SIDE ================= -->
+        <div class="login-left">
+            <div class="login-brand-top">
+                <div class="sc-logo-badge">SC</div>
+                <div>
+                    <strong style="font-size:16px; display:block; line-height:1.2;">Smart Construction</strong>
+                    <small style="color:#8CA6B5; font-size:8.5px; letter-spacing:1px; font-weight:700;">PROJECT MANAGEMENT SYSTEM</small>
+                </div>
+            </div>
+
+            <div class="login-left-body">
+                <h2>Welcome <span>Back.</span></h2>
+                <p>Manage your construction projects, workforce, attendance, payroll and site progress from one centralized platform.</p>
+
+                <div class="login-feature-bullets">
+                    <div class="login-bullet-item">
+                        <div class="login-bullet-icon"><i class="bi bi-buildings"></i></div>
+                        <span>Centralized Project Management</span>
+                    </div>
+                    <div class="login-bullet-item">
+                        <div class="login-bullet-icon"><i class="bi bi-people"></i></div>
+                        <span>Workforce &amp; Attendance Tracking</span>
+                    </div>
+                    <div class="login-bullet-item">
+                        <div class="login-bullet-icon"><i class="bi bi-cash-stack"></i></div>
+                        <span>Payroll &amp; Salary Management</span>
+                    </div>
+                    <div class="login-bullet-item">
+                        <div class="login-bullet-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                        <span>Real-time Progress Monitoring</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-left-footer">
+                &copy; 2026 Smart Construction Management System.
+            </div>
+        </div>
+
+        <!-- ================= RIGHT SIDE: FORM ================= -->
+        <div class="login-right">
+            <div class="login-title">Sign in</div>
+            <div class="login-subtitle">Login to access your Smart Construction account.</div>
+
+            <!-- Role Selection -->
+            <div class="role-selector-container">
+                <span class="role-selector-label">Select Your Role</span>
+                <div class="role-cards-grid">
+                    <label class="role-card-option active" id="roleCardAdmin">
+                        <input type="radio" name="authRole" value="admin" checked>
+                        <div class="role-card-icon"><i class="bi bi-person-badge"></i></div>
+                        <div class="role-card-text">
+                            <strong>Administrator</strong>
+                            <small>Full system access</small>
+                        </div>
+                    </label>
+
+                    <label class="role-card-option" id="roleCardEngineer">
+                        <input type="radio" name="authRole" value="engineer">
+                        <div class="role-card-icon"><i class="bi bi-person-gear"></i></div>
+                        <div class="role-card-text">
+                            <strong>Engineer</strong>
+                            <small>Project access</small>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="alert alert-danger login-alert" id="loginAlert"></div>
+
+            <form id="loginForm" autocomplete="off">
+                <!-- Email Field -->
+                <div class="form-floating-custom">
+                    <label for="loginEmail">Email Address</label>
+                    <div class="input-group-custom">
+                        <span class="input-icon-prefix"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="loginEmail" class="input-field-custom" placeholder="name@company.com" required>
+                    </div>
+                </div>
+
+                <!-- Engineer ID Field (Only visible when Engineer is selected) -->
+                <div class="form-floating-custom" id="engineerIdWrapper" style="display: none;">
+                    <label for="engineerIdInput">Engineer ID</label>
+                    <div class="input-group-custom">
+                        <span class="input-icon-prefix"><i class="bi bi-person-vcard"></i></span>
+                        <input type="text" id="engineerIdInput" class="input-field-custom" placeholder="e.g. ENG-001" maxlength="20">
+                    </div>
+                    <div class="engineer-id-help">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>Engineer ID is provided by the Administrator.</span>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-floating-custom">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-group-custom">
+                        <span class="input-icon-prefix"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="loginPassword" class="input-field-custom" placeholder="Enter your password" required>
+                        <button type="button" class="btn btn-link text-muted p-2" id="togglePasswordBtn" style="border:0;">
+                            <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Captcha Verification -->
+                <div class="form-floating-custom">
+                    <label>Security Verification</label>
+                    <div class="captcha-box">
+                        <div class="captcha-badge" id="captchaQuestion">3 + 6 = ?</div>
+                        <div class="captcha-input-group">
+                            <input type="number" id="captchaAnswer" class="captcha-input" placeholder="Answer" required>
+                            <button type="button" class="captcha-refresh-btn" id="refreshCaptchaBtn" title="Refresh math challenge">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-login" id="loginSubmitBtn">
+                    <span>Sign in to Account</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        let currentCaptchaAnswer = 0;
+
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 9) + 1;
+            const num2 = Math.floor(Math.random() * 9) + 1;
+            currentCaptchaAnswer = num1 + num2;
+            document.getElementById('captchaQuestion').textContent = `${num1} + ${num2} = ?`;
+            document.getElementById('captchaAnswer').value = '';
+        }
+
+        // Toggle Password Visibility
+        document.getElementById('togglePasswordBtn').addEventListener('click', function() {
+            const passInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('passwordEyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.className = 'bi bi-eye-slash';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.className = 'bi bi-eye';
+            }
+        });
+
+        // Role Switcher
+        const roleCardAdmin = document.getElementById('roleCardAdmin');
+        const roleCardEngineer = document.getElementById('roleCardEngineer');
+        const engineerIdWrapper = document.getElementById('engineerIdWrapper');
+        const engineerIdInput = document.getElementById('engineerIdInput');
+
+        roleCardAdmin.addEventListener('click', function() {
+            roleCardAdmin.classList.add('active');
+            roleCardEngineer.classList.remove('active');
+            roleCardAdmin.querySelector('input').checked = true;
+            engineerIdWrapper.style.display = 'none';
+            engineerIdInput.removeAttribute('required');
+        });
+
+        roleCardEngineer.addEventListener('click', function() {
+            roleCardEngineer.classList.add('active');
+            roleCardAdmin.classList.remove('active');
+            roleCardEngineer.querySelector('input').checked = true;
+            engineerIdWrapper.style.display = 'block';
+            engineerIdInput.setAttribute('required', 'required');
+        });
+
+        document.getElementById('refreshCaptchaBtn').addEventListener('click', generateCaptcha);
+        generateCaptcha();
+
+        // Form Submit
+        const loginForm = document.getElementById('loginForm');
+        const loginAlert = document.getElementById('loginAlert');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            loginAlert.style.display = 'none';
+
+            // Verify Captcha
+            const userAnswer = parseInt(document.getElementById('captchaAnswer').value, 10);
+            if (userAnswer !== currentCaptchaAnswer) {
+                loginAlert.textContent = 'Incorrect security verification answer. Please try again.';
+                loginAlert.style.display = 'block';
+                generateCaptcha();
+                return;
+            }
+
+            const selectedRole = document.querySelector('input[name="authRole"]:checked').value;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const engineerId = selectedRole === 'engineer' ? engineerIdInput.value.trim() : null;
+
+            if (selectedRole === 'engineer' && !engineerId) {
+                loginAlert.textContent = 'Please enter your Engineer ID (e.g. ENG-001).';
+                loginAlert.style.display = 'block';
+                return;
+            }
+
+            loginSubmitBtn.disabled = true;
+            loginSubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Signing in...';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        role: selectedRole,
+                        engineerId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Login failed. Please check your credentials.');
+                }
+
+                // Store Token and User info
+                if (data.token) {
+                    localStorage.setItem('smartConstructionToken', data.token);
+                }
+
+                const userRecord = {
+                    id: data.user.id,
+                    name: data.user.name,
+                    email: data.user.email,
+                    role: data.user.role,
+                    engineerId: data.user.engineerId || null,
+                    projectId: data.user.projectId || null,
+                    designation: data.user.designation || null,
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('smartConstructionUser', JSON.stringify(userRecord));
+                localStorage.setItem('isLoggedIn', 'true');
+
+                // Redirect according to authenticated role
+                if (selectedRole === 'engineer') {
+                    window.location.href = '/engineer-dashboard.html';
+                } else {
+                    window.location.href = '/dashboard.html';
+                }
+
+            } catch (err) {
+                loginAlert.textContent = err.message || 'Unable to connect to server. Please try again.';
+                loginAlert.style.display = 'block';
+                loginSubmitBtn.disabled = false;
+                loginSubmitBtn.innerHTML = '<span>Sign in to Account</span> <i class="bi bi-arrow-right"></i>';
+                generateCaptcha();
+            }
+        });
+    </script>
+</body>
+
+</html>

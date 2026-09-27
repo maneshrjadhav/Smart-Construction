@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings &amp; Security | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .profile-hero-card {
+            background: linear-gradient(135deg, #082B3A 0%, #0c3c52 100%);
+            border-radius: 14px;
+            padding: 30px;
+            color: #ffffff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .avatar-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0FA8C4, #27C4E8);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-pill-item {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-pill-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .info-pill-val {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">System / Account Settings</div>
+                        <h1 class="page-heading-title">Profile &amp; Credentials Security</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Profile Hero Banner -->
+                <div class="profile-hero-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-large position-relative" id="profileAvatarContainer">
+                            <span id="avatarInitials">SC</span>
+                            <img id="avatarImg" src="" alt="Profile Photo" style="display: none;">
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h2 class="h4 fw-bold mb-0 text-white" id="heroUserName">User Name</h2>
+                                <span class="badge" id="heroUserRoleBadge" style="background: rgba(15, 168, 196, 0.25); color: #27C4E8; border: 1px solid #0FA8C4; font-size: 11px;">Role</span>
+                            </div>
+                            <div class="text-white-50 small mb-2" id="heroUserEmail">user@smartbuild.com</div>
+                            <div class="d-flex gap-2">
+                                <label class="btn btn-sm btn-outline-light" style="font-size: 11.5px; border-radius: 6px; cursor: pointer;">
+                                    <i class="bi bi-camera me-1"></i> Upload Photo
+                                    <input type="file" id="photoFileInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                                </label>
+                                <button type="button" class="btn btn-sm btn-outline-danger" id="removePhotoBtn" style="font-size: 11.5px; border-radius: 6px; display: none;" onclick="removeProfilePhoto()">
+                                    <i class="bi bi-trash me-1"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn btn-outline-light btn-sm px-3" onclick="logout()" style="border-radius: 8px; font-weight: 600;">
+                            <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Account Information & Security Row -->
+                <div class="row g-4">
+                    <!-- Left Column: User Profile Overview -->
+                    <div class="col-lg-6">
+                        <div class="saas-card h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h3 class="saas-card-title">Account Specifications</h3>
+                                    <div class="saas-card-sub">Verified credentials stored securely in MySQL database</div>
+                                </div>
+                                <span class="saas-badge saas-badge-success"><i class="bi bi-shield-check me-1"></i>Active</span>
+                            </div>
+
+                            <div class="info-pill-item">
+                                <span class="info-pill-label">Full Name</span>
+                                <span class="info-pill-val" id="infoFullName">—</span>
+                            </div>
+
+                            <div class="info-pill-item">
+                                <span class="info-pill-label">Official Email</span>
+                                <span class="info-pill-val" id="infoEmail">—</span>
+                            </div>
+
+                            <div class="info-pill-item">
+                                <span class="info-pill-label">System Role</span>
+                                <span class="info-pill-val" id="infoRole">—</span>
+                            </div>
+
+                            <div class="info-pill-item" id="infoEngineerCodeRow" style="display: none;">
+                                <span class="info-pill-label">Engineer ID Code</span>
+                                <span class="info-pill-val text-info" id="infoEngineerCode">—</span>
+                            </div>
+
+                            <div class="info-pill-item" id="infoDesignationRow" style="display: none;">
+                                <span class="info-pill-label">Designation / Field</span>
+                                <span class="info-pill-val" id="infoDesignation">—</span>
+                            </div>
+
+                            <div class="info-pill-item">
+                                <span class="info-pill-label">Authentication Method</span>
+                                <span class="info-pill-val" style="font-family: monospace; font-size: 12.5px;">Bcrypt + JWT (SHA-256)</span>
+                            </div>
+
+                            <div class="info-pill-item">
+                                <span class="info-pill-label">Account Created</span>
+                                <span class="info-pill-val" id="infoCreatedAt">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Change Password -->
+                    <div class="col-lg-6">
+                        <div class="saas-card h-100">
+                            <div class="mb-3">
+                                <h3 class="saas-card-title">Update Security Password</h3>
+                                <div class="saas-card-sub">Change your dashboard password. Passwords are salted and hashed via bcrypt.</div>
+                            </div>
+
+                            <form id="passwordChangeForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size: 12.5px;">Current Password *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="currentPasswordInput" placeholder="Enter existing password" required>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('currentPasswordInput')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size: 12.5px;">New Password *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="newPasswordInput" placeholder="Minimum 6 characters" minlength="6" required>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('newPasswordInput')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 11px;">Must be at least 6 characters with letters and numbers.</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold" style="font-size: 12.5px;">Confirm New Password *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Re-enter new password" minlength="6" required>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('confirmPasswordInput')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-saas-primary w-100 py-2" id="submitPasswordBtn">
+                                    <i class="bi bi-key-fill"></i>
+                                    <span>Update Password</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('account-settings', !isAdministrator);
+        initAppNavigation('account-settings');
+
+        // Populate User Info
+        function displayUserInfo(u) {
+            document.getElementById('heroUserName').textContent = u.name || 'User';
+            document.getElementById('heroUserRoleBadge').textContent = u.role || 'Administrator';
+            document.getElementById('heroUserEmail').textContent = u.email || 'user@smartbuild.com';
+
+            document.getElementById('infoFullName').textContent = formatValue(u.name);
+            document.getElementById('infoEmail').textContent = formatValue(u.email);
+            document.getElementById('infoRole').textContent = formatValue(u.role);
+            document.getElementById('infoCreatedAt').textContent = formatDate(u.created_at || u.createdAt || new Date());
+
+            const initials = (u.name || 'SC').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('avatarInitials').textContent = initials;
+
+            if (u.engineerId || (u.role || '').toLowerCase() === 'engineer') {
+                document.getElementById('infoEngineerCodeRow').style.display = 'flex';
+                document.getElementById('infoEngineerCode').textContent = formatValue(u.engineerId || 'ENG-001');
+                if (u.designation) {
+                    document.getElementById('infoDesignationRow').style.display = 'flex';
+                    document.getElementById('infoDesignation').textContent = formatValue(u.designation);
+                }
+            }
+
+            // Load saved photo
+            const savedPhoto = localStorage.getItem('smartConstructionProfilePhoto');
+            const imgEl = document.getElementById('avatarImg');
+            const initEl = document.getElementById('avatarInitials');
+            const removeBtn = document.getElementById('removePhotoBtn');
+
+            if (savedPhoto) {
+                imgEl.src = savedPhoto;
+                imgEl.style.display = 'block';
+                initEl.style.display = 'none';
+                removeBtn.style.display = 'inline-block';
+            } else {
+                imgEl.style.display = 'none';
+                initEl.style.display = 'block';
+                removeBtn.style.display = 'none';
+            }
+        }
+
+        async function fetchLiveProfile() {
+            if (!user || !user.id) {
+                displayUserInfo(user || {});
+                return;
+            }
+            try {
+                const res = await fetch(`/api/auth/profile/${user.id}`);
+                const data = await res.json();
+                if (res.ok && data.success && data.user) {
+                    const merged = { ...user, ...data.user };
+                    if (data.user.engineer) {
+                        merged.engineerId = data.user.engineer.engineer_code;
+                        merged.designation = data.user.engineer.designation;
+                    }
+                    displayUserInfo(merged);
+                } else {
+                    displayUserInfo(user);
+                }
+            } catch (_) {
+                displayUserInfo(user);
+            }
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('File Too Large', 'Please select an image smaller than 2MB.', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                localStorage.setItem('smartConstructionProfilePhoto', dataUrl);
+                document.getElementById('avatarImg').src = dataUrl;
+                document.getElementById('avatarImg').style.display = 'block';
+                document.getElementById('avatarInitials').style.display = 'none';
+                document.getElementById('removePhotoBtn').style.display = 'inline-block';
+                showToast('Profile Photo', 'Photo updated successfully.', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeProfilePhoto() {
+            localStorage.removeItem('smartConstructionProfilePhoto');
+            document.getElementById('avatarImg').src = '';
+            document.getElementById('avatarImg').style.display = 'none';
+            document.getElementById('avatarInitials').style.display = 'block';
+            document.getElementById('removePhotoBtn').style.display = 'none';
+            document.getElementById('photoFileInput').value = '';
+            showToast('Profile Photo', 'Photo removed.', 'info');
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // Change password handler
+        document.getElementById('passwordChangeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPasswordInput').value;
+            const newPassword = document.getElementById('newPasswordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+            if (newPassword !== confirmPassword) {
+                showToast('Validation Error', 'New password and confirmation do not match.', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showToast('Validation Error', 'Password must be at least 6 characters long.', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('submitPasswordBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+            try {
+                const res = await fetch(`/api/auth/change-password/${user.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to update password');
+
+                showToast('Security Update', 'Your password has been changed successfully.', 'success');
+                document.getElementById('passwordChangeForm').reset();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to change password.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        });
+
+        // Init
+        fetchLiveProfile();
+    </script>
+</body>
+
+</html>

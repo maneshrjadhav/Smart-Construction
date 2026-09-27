@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks & Assignments | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .filter-pill {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: var(--secondary);
+            color: #ffffff;
+            border-color: var(--secondary);
+        }
+
+        .priority-badge-High {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .priority-badge-Medium {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .priority-badge-Low {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+
+        .status-dropdown-select {
+            border: 1px solid var(--border-color);
+            background: #F8FAFC;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Operations / Tasks</div>
+                        <h1 class="page-heading-title">Site Tasks &amp; Work Orders</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+
+                <!-- Header Actions & Heading -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1" style="color: var(--primary);">Work Orders &amp; Activity Tracking</h2>
+                        <div class="text-muted" style="font-size: 13px;">Assign site tasks to workforce, set milestone deadlines, and track completion</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-saas-primary" onclick="openAddTaskModal()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create New Task</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metric Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e8f5f8; color:#0fa8c4;">
+                                <i class="bi bi-list-check"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">TOTAL WORK ORDERS</div>
+                                <div class="metric-number" id="totalCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#fef3c7; color:#f59e0b;">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">PENDING INITIATION</div>
+                                <div class="metric-number" id="pendingCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#e0f2fe; color:#0284c7;">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">IN PROGRESS</div>
+                                <div class="metric-number" id="inProgressCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card">
+                            <div class="metric-icon-wrap" style="background:#eaf8f0; color:#10b981;">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-label">COMPLETED TASKS</div>
+                                <div class="metric-number" id="completedCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="saas-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <!-- Search Box -->
+                        <div class="position-relative flex-grow-1" style="max-width: 380px;">
+                            <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Search by task title, project or worker..." style="font-size: 13px; height: 40px; border-radius: 8px;">
+                        </div>
+
+                        <!-- Filter Pills -->
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" class="filter-pill active" onclick="setFilter('all', this)">All</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Pending', this)">Pending</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('In Progress', this)">In Progress</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('Completed', this)">Completed</button>
+                            <button type="button" class="filter-pill" onclick="setFilter('High', this)">High Priority</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tasks Table Card -->
+                <div class="saas-card">
+                    <div class="table-responsive">
+                        <table class="saas-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>TASK DESCRIPTION</th>
+                                    <th>PROJECT</th>
+                                    <th>ASSIGNED TO</th>
+                                    <th>DUE DATE</th>
+                                    <th>PRIORITY</th>
+                                    <th>STATUS</th>
+                                    <th class="text-end">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasksTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Loading tasks...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= ADD / EDIT TASK MODAL ================= -->
+    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+                <form id="taskForm">
+                    <div class="modal-header text-white" style="background: var(--primary);">
+                        <h5 class="modal-title fw-bold" id="taskModalTitle">Create New Task</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="editTaskId">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Task Title / Description *</label>
+                            <input type="text" class="form-control" id="taskNameInput" placeholder="e.g. Foundation Concrete Pouring Block A" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Target Project *</label>
+                            <select class="form-select" id="taskProjectSelect" required>
+                                <option value="">Select Project</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Assigned Worker / Team *</label>
+                            <input type="text" class="form-control" id="taskWorkerInput" list="workersDataList" placeholder="e.g. Rajesh Kumar (Foreman)" required>
+                            <datalist id="workersDataList"></datalist>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Target Due Date *</label>
+                                <input type="date" class="form-control" id="taskDueDateInput" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 12.5px;">Priority Level</label>
+                                <select class="form-select" id="taskPrioritySelect">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold" style="font-size: 12.5px;">Current Status</label>
+                            <select class="form-select" id="taskStatusSelect">
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary">
+                            <i class="bi bi-check-lg"></i>
+                            <span id="saveTaskBtnLabel">Save Task</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Core JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Initialize unified sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('tasks', !isAdministrator);
+        initAppNavigation('tasks');
+
+        // State
+        let allTasks = [];
+        let allProjects = [];
+        let allWorkers = [];
+        let currentFilter = 'all';
+
+        const taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+
+        // Load data
+        async function loadTasks() {
+            try {
+                const res = await fetch('/api/tasks');
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to fetch tasks');
+                allTasks = data.tasks || [];
+                renderTasks();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', 'Unable to retrieve tasks from server.', 'error');
+            }
+        }
+
+        async function loadProjectsDropdown() {
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                allProjects = data.projects || [];
+                const select = document.getElementById('taskProjectSelect');
+                select.innerHTML = '<option value="">Select Project</option>';
+                allProjects.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name;
+                    opt.textContent = `${p.name} (${formatValue(p.projectCode, 'PRJ-' + p.id)})`;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.warn('Projects dropdown loading error', err);
+            }
+        }
+
+        async function loadWorkersDataList() {
+            try {
+                const res = await fetch('/api/workers');
+                const data = await res.json();
+                allWorkers = data.workers || [];
+                const datalist = document.getElementById('workersDataList');
+                datalist.innerHTML = '';
+                allWorkers.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = `${w.name} (${w.role || 'Worker'})`;
+                    datalist.appendChild(opt);
+                });
+            } catch (err) {
+                console.warn('Workers datalist loading error', err);
+            }
+        }
+
+        function getFilteredTasks() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            return allTasks.filter(t => {
+                const title = (t.task_name || t.name || '').toLowerCase();
+                const proj = (t.project || '').toLowerCase();
+                const worker = (t.assigned_to || '').toLowerCase();
+                const matchesQuery = !q || title.includes(q) || proj.includes(q) || worker.includes(q);
+
+                let matchesFilter = true;
+                if (currentFilter === 'Pending') matchesFilter = (t.status || '').toLowerCase() === 'pending';
+                else if (currentFilter === 'In Progress') matchesFilter = (t.status || '').toLowerCase() === 'in progress';
+                else if (currentFilter === 'Completed') matchesFilter = (t.status || '').toLowerCase() === 'completed';
+                else if (currentFilter === 'High') matchesFilter = (t.priority || '').toLowerCase() === 'high';
+
+                return matchesQuery && matchesFilter;
+            });
+        }
+
+        function renderTasks() {
+            const list = getFilteredTasks();
+            const tbody = document.getElementById('tasksTableBody');
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-check2-circle fs-2 d-block mb-2"></i>
+                            No task records found matching your filters.
+                        </td>
+                    </tr>
+                `;
+                updateMetrics();
+                return;
+            }
+
+            tbody.innerHTML = list.map(t => {
+                const priority = t.priority || 'Medium';
+                const status = t.status || 'Pending';
+
+                let statusBadgeClass = 'saas-badge-warning';
+                if (status.toLowerCase() === 'completed') statusBadgeClass = 'saas-badge-success';
+                if (status.toLowerCase() === 'in progress') statusBadgeClass = 'saas-badge-info';
+
+                return `
+                    <tr>
+                        <td>
+                            <strong style="color: var(--primary);">${formatValue(t.task_name || t.name)}</strong>
+                        </td>
+                        <td>
+                            <span class="saas-badge saas-badge-info"><i class="bi bi-buildings me-1"></i>${formatValue(t.project)}</span>
+                        </td>
+                        <td>
+                            <i class="bi bi-person-circle text-muted me-1"></i>${formatValue(t.assigned_to)}
+                        </td>
+                        <td>
+                            <span class="fw-semibold">${formatDate(t.due_date)}</span>
+                        </td>
+                        <td>
+                            <span class="saas-badge priority-badge-${priority}">${priority}</span>
+                        </td>
+                        <td>
+                            <select class="status-dropdown-select" onchange="updateTaskStatus(${t.id}, this.value)">
+                                <option value="Pending" ${status.toLowerCase() === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="In Progress" ${status.toLowerCase() === 'in progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Completed" ${status.toLowerCase() === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2" onclick="editTask(${t.id})" title="Edit Task">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light border p-1 px-2 text-danger" onclick="deleteTask(${t.id})" title="Delete Task">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const total = allTasks.length;
+            const pending = allTasks.filter(t => (t.status || '').toLowerCase() === 'pending').length;
+            const inProgress = allTasks.filter(t => (t.status || '').toLowerCase() === 'in progress').length;
+            const completed = allTasks.filter(t => (t.status || '').toLowerCase() === 'completed').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('inProgressCount').textContent = inProgress;
+            document.getElementById('completedCount').textContent = completed;
+        }
+
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            renderTasks();
+        }
+
+        function openAddTaskModal() {
+            document.getElementById('taskModalTitle').textContent = 'Create New Task';
+            document.getElementById('saveTaskBtnLabel').textContent = 'Create Task';
+            document.getElementById('taskForm').reset();
+            document.getElementById('editTaskId').value = '';
+            document.getElementById('taskDueDateInput').valueAsDate = new Date();
+            taskModal.show();
+        }
+
+        function editTask(id) {
+            const t = allTasks.find(x => Number(x.id) === Number(id));
+            if (!t) return;
+
+            document.getElementById('taskModalTitle').textContent = 'Edit Task Details';
+            document.getElementById('saveTaskBtnLabel').textContent = 'Update Task';
+            document.getElementById('editTaskId').value = t.id;
+            document.getElementById('taskNameInput').value = t.task_name || t.name || '';
+            document.getElementById('taskProjectSelect').value = t.project || '';
+            document.getElementById('taskWorkerInput').value = t.assigned_to || '';
+
+            if (t.due_date) {
+                const d = new Date(t.due_date);
+                if (!isNaN(d.getTime())) document.getElementById('taskDueDateInput').value = d.toISOString().split('T')[0];
+            } else {
+                document.getElementById('taskDueDateInput').value = '';
+            }
+
+            document.getElementById('taskPrioritySelect').value = t.priority || 'Medium';
+            document.getElementById('taskStatusSelect').value = t.status || 'Pending';
+
+            taskModal.show();
+        }
+
+        // Quick status update from select dropdown
+        async function updateTaskStatus(id, newStatus) {
+            try {
+                const res = await fetch(`/api/tasks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to update status');
+
+                showToast('Status Updated', `Task status changed to "${newStatus}".`, 'success');
+                const t = allTasks.find(x => Number(x.id) === Number(id));
+                if (t) t.status = newStatus;
+                updateMetrics();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to update status.', 'error');
+                loadTasks();
+            }
+        }
+
+        // Form Submit
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editTaskId').value;
+            const payload = {
+                task_name: document.getElementById('taskNameInput').value.trim(),
+                project: document.getElementById('taskProjectSelect').value.trim(),
+                assigned_to: document.getElementById('taskWorkerInput').value.trim(),
+                due_date: document.getElementById('taskDueDateInput').value,
+                priority: document.getElementById('taskPrioritySelect').value,
+                status: document.getElementById('taskStatusSelect').value
+            };
+
+            try {
+                const url = editId ? `/api/tasks/${editId}` : '/api/tasks';
+                const method = editId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save task');
+
+                taskModal.hide();
+                showToast('Success', editId ? 'Task updated successfully.' : 'New task assigned successfully.', 'success');
+                await loadTasks();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to save task.', 'error');
+            }
+        });
+
+        async function deleteTask(id) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+
+            try {
+                const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete task');
+
+                showToast('Deleted', 'Task removed.', 'info');
+                await loadTasks();
+            } catch (err) {
+                console.error(err);
+                showToast('Error', err.message || 'Unable to delete task.', 'error');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderTasks);
+
+        // Init
+        loadTasks();
+        loadProjectsDropdown();
+        loadWorkersDataList();
+    </script>
+</body>
+
+</html>

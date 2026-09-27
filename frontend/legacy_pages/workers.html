@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workforce Management | Smart Construction</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- App Theme CSS -->
+    <link href="assets/css/app-theme.css" rel="stylesheet">
+
+    <style>
+        .workforce-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .workforce-tab-btn {
+            background: none;
+            border: 0;
+            padding: 10px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .workforce-tab-btn.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .credential-box-modal {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .credential-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .credential-row:last-child {
+            border-bottom: 0;
+        }
+
+        .credential-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .credential-value {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar"></aside>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <div class="page-breadcrumb">Operations / Workforce</div>
+                        <h1 class="page-heading-title">Workforce &amp; Engineer Records</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-profile" onclick="window.location.href='account_settings.html'">
+                        <div class="profile-avatar-circle" id="topbarAvatar">SC</div>
+                        <div class="profile-info">
+                            <strong id="topbarUserName">User</strong>
+                            <span id="topbarUserRole">Role</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+                <!-- Navigation Tabs: Workers vs. Engineers -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                    <div class="workforce-tabs mb-0">
+                        <button type="button" class="workforce-tab-btn active" id="tabWorkersBtn" onclick="switchWorkforceTab('workers')">
+                            <i class="bi bi-people"></i>
+                            <span>Site Workers (<span id="countWorkersBadge">0</span>)</span>
+                        </button>
+                        <button type="button" class="workforce-tab-btn admin-only-feature" id="tabEngineersBtn" onclick="switchWorkforceTab('engineers')">
+                            <i class="bi bi-person-gear"></i>
+                            <span>Site Engineers (<span id="countEngineersBadge">0</span>)</span>
+                        </button>
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn-saas-primary" id="addEntityBtn" onclick="openAddModal()">
+                            <i class="bi bi-plus-circle"></i>
+                            <span id="addBtnLabel">Add Worker</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECTION 1: WORKERS TAB -->
+                <div id="sectionWorkers">
+                    <div class="saas-card mb-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Construction Workers Roster</h3>
+                                <div class="saas-card-sub">Registered laborers, supervisors, and specialized trade technicians</div>
+                            </div>
+                            <div style="max-width: 280px; width: 100%;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0" id="searchWorkerInput" placeholder="Search by name, role...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="saas-table-container">
+                            <table class="saas-table">
+                                <thead>
+                                    <tr>
+                                        <th>Worker Code</th>
+                                        <th>Name</th>
+                                        <th>Trade Role</th>
+                                        <th>Phone</th>
+                                        <th>Daily Wage</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workersTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-5">
+                                            <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading workforce roster...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: ENGINEERS TAB (ADMINISTRATOR ONLY) -->
+                <div id="sectionEngineers" style="display: none;">
+                    <div class="saas-card mb-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                            <div>
+                                <h3 class="saas-card-title">Site Engineers &amp; Project Managers</h3>
+                                <div class="saas-card-sub">Authorized technical supervisors with assigned project access</div>
+                            </div>
+                            <div style="max-width: 280px; width: 100%;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0" id="searchEngineerInput" placeholder="Search engineers...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="saas-table-container">
+                            <table class="saas-table">
+                                <thead>
+                                    <tr>
+                                        <th>Engineer ID</th>
+                                        <th>Full Name</th>
+                                        <th>Designation</th>
+                                        <th>Assigned Project</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="engineersTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-5">
+                                            <div class="spinner-border spinner-border-sm me-2 text-info"></div> Loading engineer directory...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= ADD WORKER MODAL ================= -->
+    <div class="modal fade" id="addWorkerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-bottom px-4 py-3">
+                    <h5 class="modal-title fw-bold" style="font-size: 16px;">Add New Construction Worker</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addWorkerForm">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Full Name *</label>
+                            <input type="text" class="form-control" id="workerNameInput" placeholder="e.g. Ramesh Kumar" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Trade Role *</label>
+                                <select class="form-select" id="workerRoleInput" required>
+                                    <option value="Mason">Mason</option>
+                                    <option value="Carpenter">Carpenter</option>
+                                    <option value="Electrician">Electrician</option>
+                                    <option value="Plumber">Plumber</option>
+                                    <option value="Steel Fixer">Steel Fixer</option>
+                                    <option value="Painter">Painter</option>
+                                    <option value="General Laborer">General Laborer</option>
+                                    <option value="Site Supervisor">Site Supervisor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Phone Number *</label>
+                                <input type="tel" class="form-control" id="workerPhoneInput" placeholder="+91 9876543210" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Daily Wage (₹) *</label>
+                                <input type="number" class="form-control" id="workerWageInput" placeholder="e.g. 750" required min="100">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Assigned Project</label>
+                                <select class="form-select" id="workerProjectInput">
+                                    <option value="">Select Project</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Status</label>
+                            <select class="form-select" id="workerStatusInput">
+                                <option value="Active">Active</option>
+                                <option value="On Leave">On Leave</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top px-4 py-3">
+                        <button type="button" class="btn btn-sm btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary" id="saveWorkerSubmitBtn">
+                            <span>Save Worker</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADD ENGINEER MODAL (ADMIN ONLY) ================= -->
+    <div class="modal fade" id="addEngineerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-bottom px-4 py-3">
+                    <h5 class="modal-title fw-bold" style="font-size: 16px;">Create Site Engineer Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addEngineerForm">
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Full Name *</label>
+                                <input type="text" class="form-control" id="engFullName" placeholder="e.g. Deepak Verma" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Email Address (Login ID) *</label>
+                                <input type="email" class="form-control" id="engEmail" placeholder="engineer@company.com" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Phone Number *</label>
+                                <input type="tel" class="form-control" id="engPhone" placeholder="+91 9876543210" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Designation *</label>
+                                <select class="form-select" id="engDesignation" required>
+                                    <option value="Site Engineer">Site Engineer</option>
+                                    <option value="Project Engineer">Project Engineer</option>
+                                    <option value="Civil Engineer">Civil Engineer</option>
+                                    <option value="Senior Site Engineer">Senior Site Engineer</option>
+                                    <option value="Quality Engineer">Quality Engineer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Qualification *</label>
+                                <input type="text" class="form-control" id="engQualification" placeholder="e.g. B.Tech Civil Engineering" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Experience (Years)</label>
+                                <input type="text" class="form-control" id="engExperience" placeholder="e.g. 5 Years">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Joining Date *</label>
+                                <input type="date" class="form-control" id="engJoiningDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 12px;">Assigned Project *</label>
+                                <select class="form-select" id="engProject" required>
+                                    <option value="">Select Project</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Site Office / Address</label>
+                            <input type="text" class="form-control" id="engAddress" placeholder="e.g. Site Office, Block B, Sector 48">
+                        </div>
+
+                        <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 11.5px; border-radius: 8px;">
+                            <i class="bi bi-info-circle-fill me-1"></i>
+                            The system will automatically generate a unique <strong>Engineer ID (e.g. ENG-002)</strong> and temporary login password.
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top px-4 py-3">
+                        <button type="button" class="btn btn-sm btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-saas-primary" id="saveEngineerSubmitBtn">
+                            <span>Create Engineer Account</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ENGINEER CREDENTIALS MODAL ================= -->
+    <div class="modal fade" id="engineerCredentialsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-bottom px-4 py-3 bg-light">
+                    <h5 class="modal-title fw-bold text-success" style="font-size: 16px;">
+                        <i class="bi bi-check-circle-fill me-2"></i>Engineer Created Successfully
+                    </h5>
+                </div>
+                <div class="modal-body p-4">
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px;">
+                        Please copy or note these initial login credentials. For security, the temporary password will not be displayed again.
+                    </p>
+
+                    <div class="credential-box-modal">
+                        <div class="credential-row">
+                            <span class="credential-label">Engineer ID</span>
+                            <span class="credential-value" id="credEngineerCode">ENG-002</span>
+                        </div>
+                        <div class="credential-row">
+                            <span class="credential-label">Login Email</span>
+                            <span class="credential-value" id="credEmail">engineer@company.com</span>
+                        </div>
+                        <div class="credential-row">
+                            <span class="credential-label">Temporary Password</span>
+                            <span class="credential-value" id="credPassword">SC@xY9z2</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning py-2 px-3 mb-0" style="font-size: 11.5px; border-radius: 8px;">
+                        <i class="bi bi-shield-lock-fill me-1"></i>
+                        The engineer should change their password upon their first login.
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3">
+                    <button type="button" class="btn-saas-secondary" id="copyCredentialsBtn">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Copy Credentials</span>
+                    </button>
+                    <button type="button" class="btn-saas-primary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="assets/js/app-core.js"></script>
+
+    <script>
+        const user = requireAuth();
+        const isAdministrator = (user.role || '').toLowerCase() === 'administrator' || (user.role || '').toLowerCase() === 'admin';
+
+        // Render unified sidebar
+        document.getElementById('appSidebar').innerHTML = renderSidebarHTML('workers', !isAdministrator);
+        initAppNavigation('workers');
+
+        // State
+        let allWorkers = [];
+        let allEngineers = [];
+        let allProjects = [];
+        let currentTab = 'workers';
+
+        // Modals
+        const addWorkerModal = new bootstrap.Modal(document.getElementById('addWorkerModal'));
+        const addEngineerModal = new bootstrap.Modal(document.getElementById('addEngineerModal'));
+        const engineerCredentialsModal = new bootstrap.Modal(document.getElementById('engineerCredentialsModal'));
+
+        function switchWorkforceTab(tab) {
+            currentTab = tab;
+            const tabWorkersBtn = document.getElementById('tabWorkersBtn');
+            const tabEngineersBtn = document.getElementById('tabEngineersBtn');
+            const secWorkers = document.getElementById('sectionWorkers');
+            const secEngineers = document.getElementById('sectionEngineers');
+            const addBtnLabel = document.getElementById('addBtnLabel');
+
+            if (tab === 'workers') {
+                tabWorkersBtn.classList.add('active');
+                tabEngineersBtn.classList.remove('active');
+                secWorkers.style.display = 'block';
+                secEngineers.style.display = 'none';
+                addBtnLabel.textContent = 'Add Worker';
+            } else {
+                tabEngineersBtn.classList.add('active');
+                tabWorkersBtn.classList.remove('active');
+                secEngineers.style.display = 'block';
+                secWorkers.style.display = 'none';
+                addBtnLabel.textContent = 'Add Engineer';
+            }
+        }
+
+        function openAddModal() {
+            if (currentTab === 'workers') {
+                addWorkerModal.show();
+            } else {
+                if (!isAdministrator) {
+                    showToast('Restricted', 'Only Administrators can create new engineers.', 'warning');
+                    return;
+                }
+                document.getElementById('engJoiningDate').valueAsDate = new Date();
+                addEngineerModal.show();
+            }
+        }
+
+        // 1. Load Workers
+        async function loadWorkers() {
+            try {
+                const res = await fetch('/api/workers');
+                const data = await res.json();
+                allWorkers = data.workers || [];
+                document.getElementById('countWorkersBadge').textContent = allWorkers.length;
+                renderWorkers(allWorkers);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('workersTableBody').innerHTML = `
+                    <tr><td colspan="7" class="text-center text-danger py-4">Failed to load workers.</td></tr>
+                `;
+            }
+        }
+
+        function renderWorkers(list) {
+            const tbody = document.getElementById('workersTableBody');
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="7" class="text-center text-muted py-5">
+                        <i class="bi bi-people fs-3 d-block mb-1"></i> No workers found.
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = list.map(w => {
+                let badgeClass = 'saas-badge-success';
+                if ((w.status || '').toLowerCase() === 'inactive') badgeClass = 'saas-badge-danger';
+                if ((w.status || '').toLowerCase() === 'on leave') badgeClass = 'saas-badge-warning';
+
+                return `
+                    <tr>
+                        <td class="fw-bold text-muted" style="font-size: 11.5px;">${formatValue(w.worker_code)}</td>
+                        <td class="fw-bold">${formatValue(w.name)}</td>
+                        <td><span class="saas-badge saas-badge-info">${formatValue(w.role)}</span></td>
+                        <td>${formatValue(w.phone)}</td>
+                        <td class="fw-bold text-success">${formatCurrency(w.daily_wage || w.salary)}</td>
+                        <td><span class="saas-badge ${badgeClass}">${formatValue(w.status || 'Active')}</span></td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-light p-1 px-2 text-danger" onclick="deleteWorker(${w.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 2. Load Engineers (Admin only)
+        async function loadEngineers() {
+            if (!isAdministrator) return;
+            try {
+                const res = await fetch('/api/engineers', {
+                    headers: { 'x-user-role': 'Administrator' }
+                });
+                const data = await res.json();
+                allEngineers = data.engineers || [];
+                document.getElementById('countEngineersBadge').textContent = allEngineers.length;
+                renderEngineers(allEngineers);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('engineersTableBody').innerHTML = `
+                    <tr><td colspan="7" class="text-center text-danger py-4">Failed to load engineers.</td></tr>
+                `;
+            }
+        }
+
+        function renderEngineers(list) {
+            const tbody = document.getElementById('engineersTableBody');
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="7" class="text-center text-muted py-5">
+                        <i class="bi bi-person-gear fs-3 d-block mb-1"></i> No engineers registered.
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = list.map(e => `
+                <tr>
+                    <td><span class="badge-engineer-code" style="background:#e0f8fc; color:#088199; border:1px solid #c2eef4; padding:3px 8px; border-radius:6px; font-weight:800;">${formatValue(e.engineer_code)}</span></td>
+                    <td class="fw-bold">${formatValue(e.full_name)}</td>
+                    <td>${formatValue(e.designation)}</td>
+                    <td><span class="saas-badge saas-badge-info">${formatValue(e.project_name || 'Assigned')}</span></td>
+                    <td>${formatValue(e.phone)}</td>
+                    <td><span class="saas-badge saas-badge-success">${formatValue(e.status || 'Active')}</span></td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-light p-1 px-2 text-danger" onclick="deleteEngineer(${e.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 3. Load Projects for Dropdowns
+        async function loadProjects() {
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                allProjects = data.projects || [];
+
+                const wSelect = document.getElementById('workerProjectInput');
+                const eSelect = document.getElementById('engProject');
+
+                allProjects.forEach(p => {
+                    const opt1 = new Option(p.name, p.id);
+                    const opt2 = new Option(p.name, p.id);
+                    wSelect.add(opt1);
+                    eSelect.add(opt2);
+                });
+            } catch (err) {
+                console.error('Projects load failed:', err);
+            }
+        }
+
+        // Submit Worker
+        document.getElementById('addWorkerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveWorkerSubmitBtn');
+            btn.disabled = true;
+
+            const payload = {
+                name: document.getElementById('workerNameInput').value.trim(),
+                role: document.getElementById('workerRoleInput').value,
+                phone: document.getElementById('workerPhoneInput').value.trim(),
+                daily_wage: document.getElementById('workerWageInput').value,
+                project_id: document.getElementById('workerProjectInput').value || null,
+                status: document.getElementById('workerStatusInput').value
+            };
+
+            try {
+                const res = await fetch('/api/workers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to save worker');
+
+                showToast('Success', 'Worker added successfully.', 'success');
+                addWorkerModal.hide();
+                document.getElementById('addWorkerForm').reset();
+                loadWorkers();
+            } catch (err) {
+                showToast('Error', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Submit Engineer (Admin only)
+        document.getElementById('addEngineerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveEngineerSubmitBtn');
+            btn.disabled = true;
+
+            const payload = {
+                full_name: document.getElementById('engFullName').value.trim(),
+                email: document.getElementById('engEmail').value.trim(),
+                phone: document.getElementById('engPhone').value.trim(),
+                designation: document.getElementById('engDesignation').value,
+                qualification: document.getElementById('engQualification').value.trim(),
+                experience: document.getElementById('engExperience').value.trim(),
+                joining_date: document.getElementById('engJoiningDate').value,
+                project_id: document.getElementById('engProject').value,
+                address: document.getElementById('engAddress').value.trim(),
+                status: 'Active'
+            };
+
+            try {
+                const res = await fetch('/api/engineers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-role': 'Administrator'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to create engineer');
+
+                addEngineerModal.hide();
+                document.getElementById('addEngineerForm').reset();
+
+                // Show generated credentials modal
+                if (data.credentials) {
+                    document.getElementById('credEngineerCode').textContent = data.credentials.engineerCode;
+                    document.getElementById('credEmail').textContent = data.credentials.email;
+                    document.getElementById('credPassword').textContent = data.credentials.temporaryPassword;
+                    engineerCredentialsModal.show();
+                }
+
+                showToast('Success', 'Engineer account created.', 'success');
+                loadEngineers();
+            } catch (err) {
+                showToast('Error', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Copy Credentials
+        document.getElementById('copyCredentialsBtn').addEventListener('click', function() {
+            const code = document.getElementById('credEngineerCode').textContent;
+            const email = document.getElementById('credEmail').textContent;
+            const pass = document.getElementById('credPassword').textContent;
+            const text = `Smart Construction Login Credentials:\nEngineer ID: ${code}\nEmail: ${email}\nTemporary Password: ${pass}\nLogin at: ${window.location.origin}/login.html`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied', 'Credentials copied to clipboard.', 'success');
+            });
+        });
+
+        // Delete Worker
+        async function deleteWorker(id) {
+            if (!confirm('Are you sure you want to remove this worker record?')) return;
+            try {
+                const res = await fetch(`/api/workers/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete worker');
+                showToast('Removed', 'Worker removed from roster.', 'info');
+                loadWorkers();
+            } catch (err) {
+                showToast('Error', err.message, 'error');
+            }
+        }
+
+        // Delete Engineer (Admin only)
+        async function deleteEngineer(id) {
+            if (!isAdministrator) {
+                showToast('Restricted', 'Only Administrators can delete engineers.', 'warning');
+                return;
+            }
+            if (!confirm('Are you sure you want to delete this engineer account? This will revoke their dashboard login.')) return;
+            try {
+                const res = await fetch(`/api/engineers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'x-user-role': 'Administrator' }
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete engineer');
+                showToast('Deleted', 'Engineer account removed.', 'info');
+                loadEngineers();
+            } catch (err) {
+                showToast('Error', err.message, 'error');
+            }
+        }
+
+        // Live Search
+        document.getElementById('searchWorkerInput').addEventListener('input', function(e) {
+            const q = e.target.value.toLowerCase();
+            const filtered = allWorkers.filter(w => 
+                (w.name || '').toLowerCase().includes(q) || 
+                (w.role || '').toLowerCase().includes(q) || 
+                (w.worker_code || '').toLowerCase().includes(q)
+            );
+            renderWorkers(filtered);
+        });
+
+        document.getElementById('searchEngineerInput').addEventListener('input', function(e) {
+            const q = e.target.value.toLowerCase();
+            const filtered = allEngineers.filter(eng => 
+                (eng.full_name || '').toLowerCase().includes(q) || 
+                (eng.engineer_code || '').toLowerCase().includes(q) || 
+                (eng.designation || '').toLowerCase().includes(q)
+            );
+            renderEngineers(filtered);
+        });
+
+        // Initialize Data
+        loadWorkers();
+        loadProjects();
+        if (isAdministrator) {
+            loadEngineers();
+        } else {
+            // Engineer mode: hide tab
+            document.getElementById('tabEngineersBtn').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
